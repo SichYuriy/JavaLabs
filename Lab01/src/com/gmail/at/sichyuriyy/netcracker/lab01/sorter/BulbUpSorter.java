@@ -1,7 +1,16 @@
 package com.gmail.at.sichyuriyy.netcracker.lab01.sorter;
 
+/**
+ * @author Sych
+ *
+ */
 public class BulbUpSorter implements IntSorter {
 
+    /**
+     * sort int array using bulb sort
+     * 
+     * @see com.gmail.at.sichyuriyy.netcracker.lab01.sorter.IntSorter#sort(int[])
+     */
     @Override
     public void sort(int[] arr) {
         for (int i = arr.length - 1; i > 0; i--) {
@@ -13,7 +22,12 @@ public class BulbUpSorter implements IntSorter {
         }
     }
 
-    private static void swap(int[] arr, int i, int j) {
+    /**
+     * @param arr
+     * @param i
+     * @param j
+     */
+    private void swap(int[] arr, int i, int j) {
         int p = arr[i];
         arr[i] = arr[j];
         arr[j] = p;

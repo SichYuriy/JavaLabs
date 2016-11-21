@@ -1,7 +1,16 @@
 package com.gmail.at.sichyuriyy.netcracker.lab01.sorter;
 
+/**
+ * @author Sych
+ *
+ */
 public class MergeSorter implements IntSorter {
 
+    /**
+     * sort int array using merge sort
+     * 
+     * @see com.gmail.at.sichyuriyy.netcracker.lab01.sorter.IntSorter#sort(int[])
+     */
     @Override
     public void sort(int[] arr) {
         if (arr.length < 2) {
@@ -15,7 +24,13 @@ public class MergeSorter implements IntSorter {
 
     }
 
-    private static void mergeSort(int[] arr, int from, int to, int[] buff) {
+    /**
+     * @param arr source array to sort
+     * @param from start index including
+     * @param to end index excluding
+     * @param buff buffer array
+     */
+    private void mergeSort(int[] arr, int from, int to, int[] buff) {
         if (to - from < 2) {
             return;
         }
@@ -25,6 +40,11 @@ public class MergeSorter implements IntSorter {
         merge(arr, from, to, buff);
     }
 
+    /**
+     * @param arr source array to merge
+     * @param from start index including
+     * @param to end index excluding
+     */
     private static void merge(int arr[], int from, int to, int[] buff) {
         int mid = (from + to) / 2;
         int leftIndex = from;

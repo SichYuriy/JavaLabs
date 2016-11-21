@@ -12,6 +12,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+/**
+ * 
+ * @author Sych
+ *
+ */
 public class ReflectionUtils {
 
     private ClassLoader classLoader;
@@ -22,6 +27,11 @@ public class ReflectionUtils {
         logger = Logger.getLogger(ReflectionUtils.class);
     }
 
+    /**
+     * @param packageName root package for searching implementations of an interface
+     * @param parent interface
+     * @return list of classes which implement parent interface
+     */
     public List<Class<?>> findAllSubTypes(String packageName, Class<?> parent) {
         List<Class<?>> classes = null;
         try {
@@ -47,6 +57,11 @@ public class ReflectionUtils {
         return result;
     }
     
+    /**
+     * @param packageName root package for searching annotated classes
+     * @param annotationClass class of annotation
+     * @return list of classes which are annotated with defined annotation
+     */
     public List<Class<?>> findAllAnnotatedClasses(String packageName, Class<? extends Annotation> annotationClass) {
         List<Class<?>> classes = null;
         try {
@@ -67,6 +82,12 @@ public class ReflectionUtils {
         return result;
     }
 
+    /**
+     * @param packageName root package for searching classes
+     * @return list of all classes in the package
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private List<Class<?>> findAllClasses(String packageName) throws IOException, ClassNotFoundException {
         String resourcesName = packageName.replace('.', '/');
         Enumeration<URL> resources = classLoader.getResources(resourcesName);
@@ -83,6 +104,13 @@ public class ReflectionUtils {
         return classes;
     }
 
+    /**
+     * @param directory root directory for searching classes
+     * @param packageName
+     * @return list of all classes in the directory
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException, IOException {
         List<Class<?>> classes = new LinkedList<>();
         if (!directory.exists()) {

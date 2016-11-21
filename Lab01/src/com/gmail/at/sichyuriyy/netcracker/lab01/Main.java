@@ -8,8 +8,20 @@ import com.gmail.at.sichyuriyy.netcracker.lab01.intarrayfactory.IntArrayFactory;
 import com.gmail.at.sichyuriyy.netcracker.lab01.reflection.ReflectionUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab01.sorter.IntSorter;
 
+/**
+ * @author Sych
+ *
+ */
 public class Main {
 
+    /**
+     * 
+     *  example of reflection usage
+     * 
+     * @param args
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     public static void main(String[] args) throws InstantiationException, IllegalAccessException {
 
         ReflectionUtils reflectionUtils = new ReflectionUtils();

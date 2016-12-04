@@ -10,7 +10,7 @@ import java.util.Random;
 @IntArrayFactory
 public class RandArrayFactory extends AbstractIntArrayFactory {
 
-    private int max = 1000;
+    private int max = 1000_000;
 
     /**
      * Generate new array with random elements

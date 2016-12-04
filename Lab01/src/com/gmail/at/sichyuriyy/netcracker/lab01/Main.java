@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -15,10 +16,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.reflections.Reflections;
 
 import com.gmail.at.sichyuriyy.netcracker.lab01.intarrayfactory.AbstractIntArrayFactory;
 import com.gmail.at.sichyuriyy.netcracker.lab01.intarrayfactory.IntArrayFactory;
-import com.gmail.at.sichyuriyy.netcracker.lab01.reflection.ReflectionUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab01.sorter.IntSorter;
 import com.gmail.at.sichyuriyy.netcracker.lab01.statistics.SortAnalyser;
 
@@ -84,14 +85,16 @@ public class Main {
 
     public static List<IntSorter> getAllSorters() {
         List<IntSorter> sorters = new ArrayList<>();
-        ReflectionUtils reflectionUtils = new ReflectionUtils();
+//        ReflectionUtils reflectionUtils = new ReflectionUtils();
+//        List<Class<?>> clazzes = reflectionUtils.findAllSubTypes("com.gmail.at.sichyuriyy.netcracker.lab01",
+//                IntSorter.class);
+        
+        Reflections reflections = new Reflections("com.gmail.at.sichyuriyy.netcracker.lab01.sorter");
+        Set<Class<? extends IntSorter>> clazzes = reflections.getSubTypesOf(IntSorter.class);
 
-        List<Class<?>> clazzes = reflectionUtils.findAllSubTypes("com.gmail.at.sichyuriyy.netcracker.lab01",
-                IntSorter.class);
-
-        for (Class<?> clazz : clazzes) {
+        for (Class<? extends IntSorter> clazz : clazzes) {
             try {
-                sorters.add((IntSorter) clazz.newInstance());
+                sorters.add(clazz.newInstance());
             } catch (InstantiationException e) {
                 System.out.println(clazz.getName() + " cann't be casted to IntSorter");
                 Logger.getLogger(Main.class).error(e);
@@ -105,10 +108,11 @@ public class Main {
 
     public static List<AbstractIntArrayFactory> getAllFactories() {
         List<AbstractIntArrayFactory> factories = new ArrayList<>();
-        ReflectionUtils reflectionUtils = new ReflectionUtils();
-        List<Class<?>> clazzes = reflectionUtils.findAllAnnotatedClasses("com.gmail.at.sichyuriyy.netcracker.lab01",
-                IntArrayFactory.class);
-
+//        ReflectionUtils reflectionUtils = new ReflectionUtils();
+//        List<Class<?>> clazzes = reflectionUtils.findAllAnnotatedClasses("com.gmail.at.sichyuriyy.netcracker.lab01",
+//                IntArrayFactory.class);
+        Reflections reflections = new Reflections("com.gmail.at.sichyuriyy.netcracker.lab01.intarrayfactory");
+        Set<Class<?>> clazzes = reflections.getTypesAnnotatedWith(IntArrayFactory.class);
         for (Class<?> clazz : clazzes) {
             try {
                 factories.add((AbstractIntArrayFactory) clazz.newInstance());

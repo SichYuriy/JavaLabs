@@ -18,8 +18,7 @@ public class Employee extends User {
     private EmployeePosition position;
     private List<TaskConfirmation> taskConfirmations;
 
-    private int managedProjectsCount;
-    private List<Project> managedProjects;
+
 
     private DatabaseConnector databaseConnector;
 
@@ -45,24 +44,7 @@ public class Employee extends User {
         this.timeRequests = timeRequests;
     }
 
-    public int getManagedProjectsSize() {
-        return managedProjectsCount;
-    }
 
-    public void setManagedProjectsSize(int managedProjectsCount) {
-        this.managedProjectsCount = managedProjectsCount;
-    }
-
-    public List<Project> getManagedProjects() {
-        if (managedProjects == null) {
-            managedProjects = databaseConnector.getProjectDao().findByManagerId(id);
-        }
-        return managedProjects;
-    }
-
-    public void setManagedProjects(List<Project> managedProjects) {
-        this.managedProjects = managedProjects;
-    }
 
     public EmployeePosition getPosition() {
         return position;
@@ -82,13 +64,5 @@ public class Employee extends User {
 
     public void setTaskConfirmations(List<TaskConfirmation> taskConfirmations) {
         this.taskConfirmations = taskConfirmations;
-    }
-
-    public int getManagedProjectsCount() {
-        return managedProjectsCount;
-    }
-
-    public void setManagedProjectsCount(int managedProjectsCount) {
-        this.managedProjectsCount = managedProjectsCount;
     }
 }

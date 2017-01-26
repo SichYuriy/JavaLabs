@@ -16,6 +16,7 @@ public interface DatabaseConnector {
     CustomerDao getCustomerDao();
     EmployeeDao getEmployeeDao();
     TaskConfirmationDao getTaskConfirmationDao();
+    ProjectManagerDao getProjectManagerDao();
 
 
 }

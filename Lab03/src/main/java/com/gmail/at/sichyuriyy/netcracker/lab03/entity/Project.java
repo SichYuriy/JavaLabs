@@ -13,7 +13,7 @@ import java.util.List;
 public class Project implements Serializable {
 
     private Long id;
-    private Employee projectManager;
+    private ProjectManager projectManager;
     private Customer customer;
     private List<Sprint> sprints;
     private Date startDate;
@@ -29,14 +29,14 @@ public class Project implements Serializable {
         this.id = id;
     }
 
-    public Employee getProjectManager() {
+    public ProjectManager getProjectManager() {
         if (this.projectManager == null) {
-            projectManager = databaseConnector.getEmployeeDao().findManagerByProjectId(id);
+            projectManager = databaseConnector.getProjectManagerDao().findByProjectId(id);
         }
         return projectManager;
     }
 
-    public void setProjectManager(Employee projectManager) {
+    public void setProjectManager(ProjectManager projectManager) {
         this.projectManager = projectManager;
     }
 

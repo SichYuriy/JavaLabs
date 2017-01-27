@@ -23,6 +23,7 @@ public class Task {
     private Employee.EmployeePosition requiredPosition;
     private TaskStatus status;
     private List<TaskConfirmation> taskConfirmations;
+    private Sprint sprint;
 
 
     private DatabaseConnector databaseConnector;
@@ -112,5 +113,16 @@ public class Task {
 
     public void setTaskConfirmations(List<TaskConfirmation> taskConfirmations) {
         this.taskConfirmations = taskConfirmations;
+    }
+
+    public Sprint getSprint() {
+        if (sprint == null) {
+            sprint = databaseConnector.getSprintDao().findByTaskId(id);
+        }
+        return sprint;
+    }
+
+    public void setSprint(Sprint sprint) {
+        this.sprint = sprint;
     }
 }

@@ -10,4 +10,5 @@ import java.util.List;
 public interface SprintDao extends AbstractDao<Long, Sprint> {
 
     List<Sprint> findByProjectId(Long id);
+    Sprint findByTaskId(Long id);
 }

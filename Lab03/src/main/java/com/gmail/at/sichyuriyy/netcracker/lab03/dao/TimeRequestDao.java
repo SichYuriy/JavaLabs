@@ -9,6 +9,7 @@ import java.util.List;
  */
 public interface TimeRequestDao extends AbstractDao<Long, TimeRequest> {
 
-    List<TimeRequest> findByEmployeeId(Long id);
+    List<TimeRequest> findByProjectManagerId(Long id);
+    List<TimeRequest> findByTaskId(Long id);
 
 }

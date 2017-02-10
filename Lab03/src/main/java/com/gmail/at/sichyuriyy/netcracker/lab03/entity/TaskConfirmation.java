@@ -1,7 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector.DatabaseConnector;
-
 /**
  * Created by Yuriy on 25.01.2017.
  */
@@ -16,8 +14,6 @@ public class TaskConfirmation {
     private Task task;
     private ConfirmationStatus status;
 
-    private DatabaseConnector databaseConnector;
-
     public Long getId() {
         return id;
     }
@@ -27,9 +23,6 @@ public class TaskConfirmation {
     }
 
     public Employee getEmployee() {
-        if (employee == null) {
-            employee = databaseConnector.getEmployeeDao().findByTaskConfirmationId(id);
-        }
         return employee;
     }
 
@@ -38,9 +31,6 @@ public class TaskConfirmation {
     }
 
     public Task getTask() {
-        if (task == null) {
-            task = databaseConnector.getTaskDao().findByTaskConfirmationId(id);
-        }
         return task;
     }
 
@@ -54,5 +44,15 @@ public class TaskConfirmation {
 
     public void setStatus(ConfirmationStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskConfirmation{" +
+                "id=" + id +
+                ", employee=" + employee +
+                ", task=" + task +
+                ", status=" + status +
+                '}';
     }
 }

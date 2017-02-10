@@ -1,7 +1,6 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector;
+package com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TimeRequest;
 
 /**
  * Created by Yuriy on 22.01.2017.

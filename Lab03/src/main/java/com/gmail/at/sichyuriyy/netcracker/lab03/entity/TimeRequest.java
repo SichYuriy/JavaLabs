@@ -1,7 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector.DatabaseConnector;
-
 import java.io.Serializable;
 
 /**
@@ -14,14 +12,12 @@ public class TimeRequest {
     }
 
     private Long id;
-    private Employee employee;
+    private ProjectManager manager;
     private Task task;
-    private int requestTime;
-    private int responseTime;
+    private Integer requestTime;
+    private Integer responseTime;
     private Status status;
     private String reason;
-
-    private DatabaseConnector databaseConnector;
 
     public Long getId() {
         return id;
@@ -31,21 +27,15 @@ public class TimeRequest {
         this.id = id;
     }
 
-    public Employee getEmployee() {
-        if (employee == null) {
-            employee = databaseConnector.getEmployeeDao().findByTimeRequestId(id);
-        }
-        return employee;
+    public ProjectManager getManager() {
+        return manager;
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setManager(ProjectManager manager) {
+        this.manager = manager;
     }
 
     public Task getTask() {
-        if (task == null) {
-            databaseConnector.getTaskDao().findByTimeRequestId(id);
-        }
         return task;
     }
 
@@ -53,19 +43,19 @@ public class TimeRequest {
         this.task = task;
     }
 
-    public int getRequestTime() {
+    public Integer getRequestTime() {
         return requestTime;
     }
 
-    public void setRequestTime(int requestTime) {
+    public void setRequestTime(Integer requestTime) {
         this.requestTime = requestTime;
     }
 
-    public int getResponseTime() {
+    public Integer getResponseTime() {
         return responseTime;
     }
 
-    public void setResponseTime(int responseTime) {
+    public void setResponseTime(Integer responseTime) {
         this.responseTime = responseTime;
     }
 
@@ -86,38 +76,10 @@ public class TimeRequest {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TimeRequest that = (TimeRequest) o;
-
-        if (requestTime != that.requestTime) return false;
-        if (responseTime != that.responseTime) return false;
-        if (!id.equals(that.id)) return false;
-        if (!employee.equals(that.employee)) return false;
-        if (!task.equals(that.task)) return false;
-        if (status != that.status) return false;
-        return reason != null ? reason.equals(that.reason) : that.reason == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + employee.hashCode();
-        result = 31 * result + task.hashCode();
-        result = 31 * result + requestTime;
-        result = 31 * result + responseTime;
-        result = 31 * result + status.hashCode();
-        result = 31 * result + (reason != null ? reason.hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public String toString() {
         return "TimeRequest{" +
                 "id=" + id +
-                ", employee=" + employee +
+                ", manager=" + manager +
                 ", task=" + task +
                 ", requestTime=" + requestTime +
                 ", responseTime=" + responseTime +

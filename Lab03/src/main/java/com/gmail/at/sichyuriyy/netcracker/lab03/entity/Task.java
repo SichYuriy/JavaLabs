@@ -1,9 +1,6 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector.DatabaseConnector;
-
 import java.util.List;
-import java.util.zip.CheckedInputStream;
 
 /**
  * Created by Yuriy on 21.01.2017.
@@ -11,22 +8,22 @@ import java.util.zip.CheckedInputStream;
 public class Task {
 
     public enum TaskStatus {
-        PLANED, WORKING, FINISHED
+        UNCONFIRMED, PLANED, WORKING, FINISHED
     }
 
     private Long id;
+    private String name;
     private List<Employee> employees;
     private Integer estimateTime;
     private Integer executionTime;
+    private Task parentTask;
     private List<Task> childTasks;
     private List<Task> dependencies;
     private Employee.EmployeePosition requiredPosition;
     private TaskStatus status;
     private List<TaskConfirmation> taskConfirmations;
+    private List<TimeRequest> timeRequests;
     private Sprint sprint;
-
-
-    private DatabaseConnector databaseConnector;
 
     public Long getId() {
         return id;
@@ -36,14 +33,19 @@ public class Task {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<Employee> getEmployees() {
         return employees;
     }
 
     public void setEmployees(List<Employee> employees) {
-        if (employees == null) {
-            employees = databaseConnector.getEmployeeDao().findByTaskId(id);
-        }
         this.employees = employees;
     }
 
@@ -63,11 +65,15 @@ public class Task {
         this.executionTime = executionTime;
     }
 
+    public Task getParentTask() {
+        return parentTask;
+    }
+
+    public void setParentTask(Task parentTask) {
+        this.parentTask = parentTask;
+    }
+
     public List<Task> getChildTasks() {
-        if (childTasks == null) {
-            childTasks = databaseConnector.getTaskDao()
-                    .findChildTasksByParentTaskId(id);
-        }
         return childTasks;
     }
 
@@ -76,10 +82,6 @@ public class Task {
     }
 
     public List<Task> getDependencies() {
-        if (dependencies == null) {
-            dependencies = databaseConnector.getTaskDao()
-                    .findDependenciesByParentTaskId(id);
-        }
         return dependencies;
     }
 
@@ -104,10 +106,6 @@ public class Task {
     }
 
     public List<TaskConfirmation> getTaskConfirmations() {
-        if (taskConfirmations == null) {
-            taskConfirmations = databaseConnector.getTaskConfirmationDao()
-                    .findByTaskId(id);
-        }
         return taskConfirmations;
     }
 
@@ -116,13 +114,36 @@ public class Task {
     }
 
     public Sprint getSprint() {
-        if (sprint == null) {
-            sprint = databaseConnector.getSprintDao().findByTaskId(id);
-        }
         return sprint;
     }
 
     public void setSprint(Sprint sprint) {
         this.sprint = sprint;
+    }
+
+    public List<TimeRequest> getTimeRequests() {
+        return timeRequests;
+    }
+
+    public void setTimeRequests(List<TimeRequest> timeRequests) {
+        this.timeRequests = timeRequests;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", employees=" + employees +
+                ", estimateTime=" + estimateTime +
+                ", executionTime=" + executionTime +
+                ", childTasks=" + childTasks +
+                ", dependencies=" + dependencies +
+                ", requiredPosition=" + requiredPosition +
+                ", status=" + status +
+                ", taskConfirmations=" + taskConfirmations +
+                ", sprint=" + sprint +
+                ", timeRequests=" + timeRequests +
+                '}';
     }
 }

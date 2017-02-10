@@ -1,7 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector.DatabaseConnector;
-
 import java.util.List;
 
 /**
@@ -11,13 +9,7 @@ public class Customer extends User {
 
     private List<Project> orderedProjects;
 
-    private DatabaseConnector databaseConnector;
-
-
     public List<Project> getOrderedProjects() {
-        if (orderedProjects == null) {
-            databaseConnector.getProjectDao().findByCustomerId(this.id);
-        }
         return orderedProjects;
     }
 
@@ -25,5 +17,11 @@ public class Customer extends User {
         this.orderedProjects = orderedProjects;
     }
 
-
+    @Override
+    public String toString() {
+        return super.toString() +
+                "Customer {" +
+                "orderedProjects=" + orderedProjects +
+                '}';
+    }
 }

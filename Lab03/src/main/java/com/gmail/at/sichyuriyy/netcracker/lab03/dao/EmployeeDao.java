@@ -9,8 +9,7 @@ import java.util.List;
  */
 public interface EmployeeDao extends AbstractDao<Long, Employee> {
 
-
+    Employee findByTaskConfirmationId(Long id);
     List<Employee> findByTaskId(Long id);
     Employee findByTimeRequestId(Long id);
-    Employee findByTaskConfirmationId(Long id);
 }

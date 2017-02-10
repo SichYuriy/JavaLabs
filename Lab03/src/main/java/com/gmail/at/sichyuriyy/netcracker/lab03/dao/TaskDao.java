@@ -19,6 +19,14 @@ public interface TaskDao extends AbstractDao<Long, Task> {
     void addEmployee(Long taskId, Employee employee);
     void addEmployees(Long taskId, List<Employee> employees);
     void deleteEmployee(Long taskId, Employee employee);
+    void deleteAllEmployees(Long taskId);
     Task findByTaskConfirmationId(Long id);
+    Task findByChildTaskId(Long id);
+
+    void updateDependencies(Long taskId, List<Task> dependencies);
+    void addDependency(Long taskId, Task dependency);
+    void addDependencies(Long taskId, List<Task> dependencies);
+    void deleteDependency(Long taskId, Task dependency);
+    void deleteAllDependencies(Long taskId);
 
 }

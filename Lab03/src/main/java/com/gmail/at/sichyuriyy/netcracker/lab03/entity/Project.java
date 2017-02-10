@@ -1,8 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector.DatabaseConnector;
-
-import javax.xml.crypto.Data;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
@@ -13,13 +10,15 @@ import java.util.List;
 public class Project implements Serializable {
 
     private Long id;
+    private String name;
     private ProjectManager projectManager;
     private Customer customer;
     private List<Sprint> sprints;
+    private Date planedStartDate;
+    private Date planedEndDate;
     private Date startDate;
     private Date endDate;
 
-    private DatabaseConnector databaseConnector;
 
     public Long getId() {
         return id;
@@ -29,10 +28,15 @@ public class Project implements Serializable {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public ProjectManager getProjectManager() {
-        if (this.projectManager == null) {
-            projectManager = databaseConnector.getProjectManagerDao().findByProjectId(id);
-        }
         return projectManager;
     }
 
@@ -41,9 +45,6 @@ public class Project implements Serializable {
     }
 
     public Customer getCustomer() {
-        if (customer == null) {
-            customer = databaseConnector.getCustomerDao().findByProjectId(id);
-        }
         return customer;
     }
 
@@ -52,14 +53,27 @@ public class Project implements Serializable {
     }
 
     public List<Sprint> getSprints() {
-        if (sprints == null) {
-            sprints = databaseConnector.getSprintDao().findByProjectId(id);
-        }
         return sprints;
     }
 
     public void setSprints(List<Sprint> sprints) {
         this.sprints = sprints;
+    }
+
+    public Date getPlanedStartDate() {
+        return planedStartDate;
+    }
+
+    public void setPlanedStartDate(Date planedStartDate) {
+        this.planedStartDate = planedStartDate;
+    }
+
+    public Date getPlanedEndDate() {
+        return planedEndDate;
+    }
+
+    public void setPlanedEndDate(Date planedEndDate) {
+        this.planedEndDate = planedEndDate;
     }
 
     public Date getStartDate() {
@@ -77,4 +91,6 @@ public class Project implements Serializable {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+
+
 }

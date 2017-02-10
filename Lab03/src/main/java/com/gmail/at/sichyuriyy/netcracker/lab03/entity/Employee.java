@@ -1,7 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.DatabaseConnector.DatabaseConnector;
-
 import java.util.List;
 
 /**
@@ -18,14 +16,7 @@ public class Employee extends User {
     private EmployeePosition position;
     private List<TaskConfirmation> taskConfirmations;
 
-
-
-    private DatabaseConnector databaseConnector;
-
     public List<Task> getTasks() {
-        if (tasks == null) {
-            tasks = databaseConnector.getTaskDao().findByEmployeeId(id);
-        }
         return tasks;
     }
 
@@ -34,17 +25,12 @@ public class Employee extends User {
     }
 
     public List<TimeRequest> getTimeRequests() {
-        if (timeRequests == null) {
-            timeRequests = databaseConnector.getTimeRequestDao().findByEmployeeId(id);
-        }
         return timeRequests;
     }
 
     public void setTimeRequests(List<TimeRequest> timeRequests) {
         this.timeRequests = timeRequests;
     }
-
-
 
     public EmployeePosition getPosition() {
         return position;
@@ -55,14 +41,21 @@ public class Employee extends User {
     }
 
     public List<TaskConfirmation> getTaskConfirmations() {
-        if (taskConfirmations == null) {
-            taskConfirmations = databaseConnector.getTaskConfirmationDao()
-                    .findByEmployeeId(id);
-        }
         return taskConfirmations;
     }
 
     public void setTaskConfirmations(List<TaskConfirmation> taskConfirmations) {
         this.taskConfirmations = taskConfirmations;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "Employee{" +
+                "tasks=" + tasks +
+                ", timeRequests=" + timeRequests +
+                ", position=" + position +
+                ", taskConfirmations=" + taskConfirmations +
+                '}';
     }
 }

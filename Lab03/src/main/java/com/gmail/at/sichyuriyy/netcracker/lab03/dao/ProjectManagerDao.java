@@ -9,4 +9,5 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.entity.ProjectManager;
 public interface ProjectManagerDao extends AbstractDao<Long, ProjectManager> {
 
     ProjectManager findByProjectId(Long id);
+    ProjectManager findByTimeRequestId(Long id);
 }

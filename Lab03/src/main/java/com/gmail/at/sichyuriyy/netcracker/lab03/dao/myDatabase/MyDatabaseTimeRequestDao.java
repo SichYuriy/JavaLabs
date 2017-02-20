@@ -11,6 +11,7 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class MyDatabaseTimeRequestDao implements TimeRequestDao {
 
     private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
+    private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
 
     private TimeRequestMapper timeRequestMapper = new TimeRequestMapper();
 
@@ -79,6 +81,17 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
                 "taskId", id);
         return requestRecords.stream()
                 .map(this::parseRecord)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TimeRequest> findByEmployeeId(Long id) {
+        List<Record> taskIdRecords = database.selectFrom(TASK_EMPLOYEE_TABLE_NAME,
+                "employeeId", id);
+        return taskIdRecords.stream()
+                .map(taskIdRecord -> taskIdRecord.getLong("id"))
+                .map(this::findByTaskId)
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 

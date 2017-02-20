@@ -3,7 +3,7 @@ package com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.exception;
 /**
  * Created by Yuriy on 11.02.2017.
  */
-public class RequestValidationException extends Exception {
+public class RequestValidationException extends RuntimeException {
 
     public RequestValidationException() {
 

@@ -31,8 +31,8 @@ public class MyDatabaseTaskConfirmationDao implements TaskConfirmationDao {
     @Override
     public void create(TaskConfirmation confirmation) {
         List<Pair<String, Object>> values = mapValues(confirmation);
-        values.add(new Pair("employeeId", confirmation.getEmployee().getId()));
-        values.add(new Pair("taskId", confirmation.getTask().getId()));
+        values.add(new Pair<>("employeeId", confirmation.getEmployee().getId()));
+        values.add(new Pair<>("taskId", confirmation.getTask().getId()));
 
         Long generatedId = database.insertInto(TASK_CONFIRMATION_TABLE_NAME, values);
         confirmation.setId(generatedId);
@@ -97,7 +97,7 @@ public class MyDatabaseTaskConfirmationDao implements TaskConfirmationDao {
 
     private List<Pair<String, Object>> mapValues(TaskConfirmation confirmation) {
         List<Pair<String, Object>> values = new ArrayList<>();
-        values.add(new Pair("status", confirmation.getStatus().toString()));
+        values.add(new Pair<>("status", confirmation.getStatus().toString()));
 
         return values;
     }

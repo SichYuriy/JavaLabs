@@ -1,12 +1,10 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.EmployeeDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.SprintDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskConfirmationDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.TaskMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.TaskMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TimeRequest;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.TaskProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
@@ -34,6 +32,11 @@ public class MyDatabaseTaskDao implements TaskDao {
     private EmployeeDao employeeDao;
     private TaskConfirmationDao taskConfirmationDao;
     private SprintDao sprintDao;
+    private TimeRequestDao timeRequestDao;
+
+    public MyDatabaseTaskDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void create(Task task) {
@@ -86,7 +89,7 @@ public class MyDatabaseTaskDao implements TaskDao {
     @Override
     public List<Task> findBySprintId(Long id) {
         List<Pair<String, Object>> filters = new ArrayList<>();
-        filters.add(new Pair<>("parentTask", null));
+        filters.add(new Pair<>("parentTaskId", null));
         filters.add(new Pair<>("sprintId", id));
         List<Record> taskRecords = database.selectFrom(TASK_TABLE_NAME, filters);
         return taskRecords.stream()
@@ -219,7 +222,7 @@ public class MyDatabaseTaskDao implements TaskDao {
 
     private Task parseRecord(Record record) {
         TaskProxy proxy = new TaskProxy(employeeDao, this,
-                taskConfirmationDao, sprintDao);
+                taskConfirmationDao, sprintDao, timeRequestDao);
         taskMapper.map(proxy, record);
         setProxies(proxy, record);
         return proxy;
@@ -261,5 +264,13 @@ public class MyDatabaseTaskDao implements TaskDao {
 
     public void setSprintDao(SprintDao sprintDao) {
         this.sprintDao = sprintDao;
+    }
+
+    public TimeRequestDao getTimeRequestDao() {
+        return timeRequestDao;
+    }
+
+    public void setTimeRequestDao(TimeRequestDao timeRequestDao) {
+        this.timeRequestDao = timeRequestDao;
     }
 }

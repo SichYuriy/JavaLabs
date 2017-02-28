@@ -46,20 +46,6 @@ public class EmployeeProxy extends Employee {
     }
 
     @Override
-    public List<TimeRequest> getTimeRequests() {
-        if (!timeRequestsLoaded) {
-            loadTimeRequests();
-        }
-        return super.getTimeRequests();
-    }
-
-    @Override
-    public void setTimeRequests(List<TimeRequest> timeRequests) {
-        timeRequestsLoaded = true;
-        super.setTimeRequests(timeRequests);
-    }
-
-    @Override
     public List<TaskConfirmation> getTaskConfirmations() {
         if (!taskConfirmationsLoaded) {
             loadTaskConfirmations();
@@ -89,11 +75,6 @@ public class EmployeeProxy extends Employee {
 
     private void loadTasks() {
         this.setTasks(taskDao.findByEmployeeId(getId()));
-    }
-
-    private void loadTimeRequests() {
-        this.setTimeRequests(timeRequestDao.findByEmployeeId(getId()));
-
     }
 
     private void loadTaskConfirmations() {

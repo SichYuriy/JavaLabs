@@ -1,10 +1,11 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.CustomerDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.ProjectDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.UserDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.CustomerMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.CustomerMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Customer;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Role;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.CustomerProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
@@ -12,7 +13,6 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -21,8 +21,10 @@ import java.util.stream.Collectors;
 public class MyDatabaseCustomerDao implements CustomerDao {
 
     private static final String USER_TABLE_NAME = "User";
-    private static final String CUSTOMER_TABLE_NAME = "Customer";
     private static final String PROJECT_TABLE_NAME = "Project";
+    private static final String ROLE_TABLE_NAME = "Role";
+    private static final String USER_ROLE_TABLE_NAME = "user_role";
+
 
     private CustomerMapper customerMapper = new CustomerMapper();
 
@@ -31,59 +33,48 @@ public class MyDatabaseCustomerDao implements CustomerDao {
     private UserDao userDao;
     private ProjectDao projectDao;
 
+    public MyDatabaseCustomerDao(Database database) {
+        this.database = database;
+    }
+
     @Override
     public void create(Customer customer) {
         List<Pair<String, Object>> values = new ArrayList<>();
-
-        List<Long> roleIdList = customer.getRoles().stream()
-                .map((r) -> (long) r.ordinal())
-                .collect(Collectors.toList());
 
         values.add(new Pair<>("firstName", customer.getFirstName()));
         values.add(new Pair<>("lastName", customer.getLastName()));
         values.add(new Pair<>("login", customer.getLogin()));
         values.add(new Pair<>("password", customer.getPassword()));
-        values.add(new Pair<>("roles", roleIdList));
 
         Long generatedUserId = database.insertInto(USER_TABLE_NAME, values);
 
-        List<Pair<String, Object>> customerValues = new ArrayList<>();
-        customerValues.add(new Pair<>("userId_extend", generatedUserId));
-        database.insertInto(CUSTOMER_TABLE_NAME, customerValues);
+        userDao.addRoles(generatedUserId, customer.getRoles());
 
         customer.setId(generatedUserId);
     }
 
     @Override
     public Customer findById(Long id) {
-        Record userRecord = database.selectFrom(USER_TABLE_NAME, id);
-        List<Record> customerRecords = database.selectFrom(CUSTOMER_TABLE_NAME,
-                "userId_extend", id);
-        if (userRecord == null
-                || customerRecords == null
-                || customerRecords.size() == 0) {
+        Record customer = database.selectFrom(USER_TABLE_NAME, id);
+        if (customer == null) {
             return null;
         }
-        Record customerRecord = customerRecords.get(0);
-
-        Record join = userRecord.join(customerRecord, "User", "Customer");
-        return parseRecord(join);
+        List<Role> roles = userDao.findRolesByUserId(id);
+        if (!roles.contains(Role.CUSTOMER)) {
+            return null;
+        }
+        return parseRecord(customer);
     }
 
     @Override
     public List<Customer> findAll() {
-        List<Record> customerRecords = database.selectFrom(CUSTOMER_TABLE_NAME);
-        return customerRecords.stream()
-                .map((r) -> {
-                    Long userRecordId = r.getLong("userId_extend");
-                    Record userRecord = database.selectFrom(USER_TABLE_NAME, userRecordId);
-                    if (userRecord == null) {
-                        return null;
-                    }
-                    return  userRecord.join(r, "User", "Customer");
-                })
-                .filter(Objects::nonNull)
-                .map(this::parseRecord)
+        Long roleId = findRoleIdByName(Role.CUSTOMER.toString());
+
+        List<Record> customerIdRecords = database.selectFrom(USER_ROLE_TABLE_NAME,
+                "roleId", roleId);
+        return customerIdRecords.stream()
+                .map(record -> record.getLong("userId"))
+                .map(this::findById)
                 .collect(Collectors.toList());
     }
 
@@ -94,15 +85,15 @@ public class MyDatabaseCustomerDao implements CustomerDao {
 
     @Override
     public void delete(Long id) {
-        database.deleteFrom(CUSTOMER_TABLE_NAME,
-                "userId_extend", id);
-        database.selectFrom(USER_TABLE_NAME, id);
-
+        database.deleteFrom(USER_TABLE_NAME, id);
     }
 
     @Override
     public Customer findByProjectId(Long id) {
         Record projectRecord = database.selectFrom(PROJECT_TABLE_NAME, id);
+        if (projectRecord == null) {
+            return null;
+        }
         Long customerId = projectRecord.getLong("customerId");
         return customerId != null ? findById(customerId) : null;
     }
@@ -135,6 +126,15 @@ public class MyDatabaseCustomerDao implements CustomerDao {
         Customer customer = new CustomerProxy(projectDao, userDao);
         customerMapper.map(customer, record);
         return customer;
+    }
+
+    private Long findRoleIdByName(String name) {
+        List<Record> roleRecords = database.selectFrom(ROLE_TABLE_NAME,
+                "name", name);
+        if (roleRecords.size() == 0) {
+            return null;
+        }
+        return roleRecords.get(0).getLong("id");
     }
 
 }

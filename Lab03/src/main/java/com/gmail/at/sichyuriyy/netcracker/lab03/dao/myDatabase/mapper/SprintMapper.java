@@ -1,4 +1,4 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Sprint;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
@@ -13,8 +13,8 @@ public class SprintMapper implements RecordMapper<Sprint> {
         sprint.setName(record.getString("name"));
         sprint.setStartDate(record.getDate("startDate"));
         sprint.setEndDate(record.getDate("endDate"));
-        sprint.setPlanedStartDate(record.getDate("plannedStartDate"));
-        sprint.setPlanedEndDate(record.getDate("plannedEndDate"));
+        sprint.setPlannedStartDate(record.getDate("plannedStartDate"));
+        sprint.setPlannedEndDate(record.getDate("plannedEndDate"));
         sprint.setFinished(record.getBoolean("finished"));
         sprint.setId(record.getLong("id"));
 

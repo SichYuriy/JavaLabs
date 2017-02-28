@@ -12,7 +12,7 @@ public class CollectionsDatabaseTest extends DatabaseTest {
 
     @Override
     protected Database getTestedDatabase() {
-        return new CollectionsDatabase();
+        return CollectionsDatabase.getCollectionsDatabase();
     }
 
     @Override

@@ -16,7 +16,7 @@ public class TimeRequestProxy extends TimeRequest {
     private ProjectManagerDao projectManagerDao;
     private TaskDao taskDao;
 
-    private boolean employeeLoaded;
+    private boolean managerLoaded;
     private boolean taskLoaded;
 
     private Long managerId;
@@ -29,7 +29,7 @@ public class TimeRequestProxy extends TimeRequest {
 
     @Override
     public ProjectManager getManager() {
-        if (!employeeLoaded) {
+        if (!managerLoaded) {
             loadManager();
         }
         return super.getManager();
@@ -37,7 +37,7 @@ public class TimeRequestProxy extends TimeRequest {
 
     @Override
     public void setManager(ProjectManager employee) {
-        employeeLoaded = true;
+        managerLoaded = true;
         super.setManager(employee);
     }
 

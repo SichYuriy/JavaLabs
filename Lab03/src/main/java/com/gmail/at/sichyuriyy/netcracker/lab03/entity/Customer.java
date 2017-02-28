@@ -1,5 +1,6 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,5 +24,19 @@ public class Customer extends User {
                 "Customer {" +
                 "orderedProjects=" + orderedProjects +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Customer)) return false;
+
+        Customer customer = (Customer) o;
+        return orderedProjects.equals(customer.orderedProjects);
+    }
+
+    @Override
+    public int hashCode() {
+        return orderedProjects.hashCode();
     }
 }

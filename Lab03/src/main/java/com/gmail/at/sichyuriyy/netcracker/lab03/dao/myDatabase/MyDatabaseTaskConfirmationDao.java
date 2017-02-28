@@ -1,9 +1,9 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.EmployeeDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskConfirmationDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.TaskConfirmationMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.TaskConfirmationMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TaskConfirmation;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.TaskConfirmationProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
@@ -27,6 +27,10 @@ public class MyDatabaseTaskConfirmationDao implements TaskConfirmationDao {
 
     private EmployeeDao employeeDao;
     private TaskDao taskDao;
+
+    public MyDatabaseTaskConfirmationDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void create(TaskConfirmation confirmation) {
@@ -82,10 +86,10 @@ public class MyDatabaseTaskConfirmationDao implements TaskConfirmationDao {
     }
 
     @Override
-    public TaskConfirmation findByTaskIdAndEmployeeId(Long taskId, Long EmployeeId) {
+    public TaskConfirmation findByTaskIdAndEmployeeId(Long taskId, Long employeeId) {
         List<Pair<String, Object>> filters = new ArrayList<>();
         filters.add(new Pair<>("taskId", taskId));
-        filters.add(new Pair<>("employeeId", employeeDao));
+        filters.add(new Pair<>("employeeId", employeeId));
 
         List<Record> confirmationRecords = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME,
                 filters);

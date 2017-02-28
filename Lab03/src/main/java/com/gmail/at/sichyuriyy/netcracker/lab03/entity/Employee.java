@@ -1,6 +1,7 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Yuriy on 21.01.2017.
@@ -12,7 +13,6 @@ public class Employee extends User {
     }
 
     private List<Task> tasks;
-    private List<TimeRequest> timeRequests;
     private EmployeePosition position;
     private List<TaskConfirmation> taskConfirmations;
 
@@ -22,14 +22,6 @@ public class Employee extends User {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
-    }
-
-    public List<TimeRequest> getTimeRequests() {
-        return timeRequests;
-    }
-
-    public void setTimeRequests(List<TimeRequest> timeRequests) {
-        this.timeRequests = timeRequests;
     }
 
     public EmployeePosition getPosition() {
@@ -53,9 +45,8 @@ public class Employee extends User {
         return super.toString() +
                 "Employee{" +
                 "tasks=" + tasks +
-                ", timeRequests=" + timeRequests +
                 ", position=" + position +
-                ", taskConfirmations=" + taskConfirmations +
+                ", taskConfirmations=" + ((taskConfirmations!= null) ? taskConfirmations.stream().map(TaskConfirmation::getId).collect(Collectors.toList()) : null) +
                 '}';
     }
 }

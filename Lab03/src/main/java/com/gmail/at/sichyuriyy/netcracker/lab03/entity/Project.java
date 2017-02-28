@@ -14,8 +14,8 @@ public class Project implements Serializable {
     private ProjectManager projectManager;
     private Customer customer;
     private List<Sprint> sprints;
-    private Date planedStartDate;
-    private Date planedEndDate;
+    private Date plannedStartDate;
+    private Date plannedEndDate;
     private Date startDate;
     private Date endDate;
 
@@ -60,20 +60,20 @@ public class Project implements Serializable {
         this.sprints = sprints;
     }
 
-    public Date getPlanedStartDate() {
-        return planedStartDate;
+    public Date getPlannedStartDate() {
+        return plannedStartDate;
     }
 
-    public void setPlanedStartDate(Date planedStartDate) {
-        this.planedStartDate = planedStartDate;
+    public void setPlannedStartDate(Date plannedStartDate) {
+        this.plannedStartDate = plannedStartDate;
     }
 
-    public Date getPlanedEndDate() {
-        return planedEndDate;
+    public Date getPlannedEndDate() {
+        return plannedEndDate;
     }
 
-    public void setPlanedEndDate(Date planedEndDate) {
-        this.planedEndDate = planedEndDate;
+    public void setPlannedEndDate(Date plannedEndDate) {
+        this.plannedEndDate = plannedEndDate;
     }
 
     public Date getStartDate() {
@@ -93,4 +93,39 @@ public class Project implements Serializable {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Project)) return false;
+
+        Project project = (Project) o;
+
+        if (id != null ? !id.equals(project.id) : project.id != null) return false;
+        if (name != null ? !name.equals(project.name) : project.name != null)
+            return false;
+        if (projectManager != null ? !projectManager.equals(project.projectManager) : project.projectManager != null)
+            return false;
+        if (customer != null ? !customer.equals(project.customer) : project.customer != null)
+            return false;
+        if (plannedStartDate != null ? !plannedStartDate.equals(project.plannedStartDate) : project.plannedStartDate != null)
+            return false;
+        if (plannedEndDate != null ? !plannedEndDate.equals(project.plannedEndDate) : project.plannedEndDate != null)
+            return false;
+        if (startDate != null ? !startDate.equals(project.startDate) : project.startDate != null)
+            return false;
+        return endDate != null ? endDate.equals(project.endDate) : project.endDate == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (projectManager != null ? projectManager.hashCode() : 0);
+        result = 31 * result + (customer != null ? customer.hashCode() : 0);
+        result = 31 * result + (plannedStartDate != null ? plannedStartDate.hashCode() : 0);
+        result = 31 * result + (plannedEndDate != null ? plannedEndDate.hashCode() : 0);
+        result = 31 * result + (startDate != null ? startDate.hashCode() : 0);
+        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
+        return result;
+    }
 }

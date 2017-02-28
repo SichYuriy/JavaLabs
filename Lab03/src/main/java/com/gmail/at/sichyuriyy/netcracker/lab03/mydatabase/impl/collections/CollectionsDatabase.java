@@ -21,6 +21,15 @@ public class CollectionsDatabase implements Database {
     private Map<String, Table> tables;
     private RequestValidator requestValidator;
 
+    private CollectionsDatabase() {
+    }
+
+    public static CollectionsDatabase getCollectionsDatabase() {
+        CollectionsDatabase collectionsDatabase = new CollectionsDatabase();
+        collectionsDatabase.initStorage();
+        return collectionsDatabase;
+    }
+
     @Override
     public void initStorage() {
         storageInitialized = true;
@@ -97,7 +106,7 @@ public class CollectionsDatabase implements Database {
         requestValidator.validatePropertyType(filterName, filterValue,
                 table.getProperties());
         return table.getRows().values().stream()
-                .filter(rowMap -> rowMap.get(filterName).equals(filterValue))
+                .filter(rowMap -> Objects.equals(rowMap.get(filterName), filterValue))
                 .map(Map::entrySet)
                 .map(this::mapEntrySet)
                 .map(RecordImpl::new)
@@ -122,7 +131,7 @@ public class CollectionsDatabase implements Database {
     private boolean checkRow(Map<String, Object> rowMap,
                              List<Pair<String, Object>> filters) {
         return filters.stream()
-                .allMatch(pair -> pair.getValue().equals(rowMap.get(pair.getKey())));
+                .allMatch(pair -> Objects.equals(pair.getValue(), rowMap.get(pair.getKey())));
     }
 
     @Override
@@ -194,7 +203,7 @@ public class CollectionsDatabase implements Database {
         Map<Long, Map<String, Object>> rows = table.getRows();
         Set<Long> idSet = new HashSet<>(rows.keySet());
         idSet.stream()
-                .filter((id) -> rows.get(id).get(filterName).equals(filterValue))
+                .filter((id) -> Objects.equals(rows.get(id).get(filterName), filterValue))
                 .forEach(rows::remove);
     }
 
@@ -263,6 +272,11 @@ public class CollectionsDatabase implements Database {
                 .filter(rowMap -> rowMap.get(filterName).equals(filterValue))
                 .forEach(row -> updateRow(row, values));
 
+    }
+
+    @Override
+    public boolean tableExists(String tableName) {
+        return tables.get(tableName) != null;
     }
 
     private void updateRow(Map<String, Object> row, List<Pair<String, Object>> values) {

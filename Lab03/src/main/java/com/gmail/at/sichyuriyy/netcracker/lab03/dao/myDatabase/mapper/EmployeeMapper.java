@@ -1,4 +1,4 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;

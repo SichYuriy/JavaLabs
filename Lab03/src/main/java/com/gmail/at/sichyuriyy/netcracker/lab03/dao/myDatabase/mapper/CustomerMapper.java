@@ -1,4 +1,4 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Customer;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
@@ -10,11 +10,11 @@ public class CustomerMapper implements RecordMapper<Customer> {
 
     @Override
     public Customer map(Customer customer, Record record) {
-        customer.setId(record.getLong("User.id"));
-        customer.setFirstName(record.getString("User.firstName"));
-        customer.setLastName(record.getString("User.lastName"));
-        customer.setPassword(record.getString("User.password"));
-        customer.setLogin(record.getString("User.login"));
+        customer.setId(record.getLong("id"));
+        customer.setFirstName(record.getString("firstName"));
+        customer.setLastName(record.getString("lastName"));
+        customer.setPassword(record.getString("password"));
+        customer.setLogin(record.getString("login"));
 
         return customer;
     }

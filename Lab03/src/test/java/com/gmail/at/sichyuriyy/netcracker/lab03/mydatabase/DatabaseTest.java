@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -474,6 +475,18 @@ public abstract class DatabaseTest {
 
     }
 
+    @Test
+    public void tableExistsTrue() throws Exception {
+        insertTestData(database);
+        assertTrue(database.tableExists("table1"));
+    }
+
+
+    @Test
+    public void tableExistsFalse() throws Exception {
+        insertTestData(database);
+        assertFalse(database.tableExists("table23"));
+    }
 
     private void insertTestData(Database database) {
         List<Pair<String, DataType>> properties = new ArrayList<>();

@@ -37,4 +37,6 @@ public interface Database {
     void update(String tableName, List<Pair<String, Object>> values,
                String filterName, Object filterValue);
 
+    boolean tableExists(String tableName);
+
 }

@@ -1,7 +1,7 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.ProjectManagerMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.ProjectManagerMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.ProjectManager;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Role;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.*;
@@ -31,28 +31,28 @@ public class MyDatabaseProjectManagerDao implements ProjectManagerDao {
 
     private TaskConfirmationDao taskConfirmationDao;
     private TaskDao taskDao;
-    private TimeRequestDao timeRequestDao;
     private ProjectDao projectDao;
     private EmployeeDao employeeDao;
     private UserDao userDao;
 
+
+    public MyDatabaseProjectManagerDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void create(ProjectManager manager) {
 
         List<Pair<String, Object>> userValues = new ArrayList<>();
 
-        List<Long> roleIdList = manager.getRoles().stream()
-                .map((r) -> (long) r.ordinal())
-                .collect(Collectors.toList());
-
         userValues.add(new Pair<>("firstName", manager.getFirstName()));
         userValues.add(new Pair<>("lastName", manager.getLastName()));
         userValues.add(new Pair<>("login", manager.getLogin()));
         userValues.add(new Pair<>("password", manager.getPassword()));
-        userValues.add(new Pair<>("roles", roleIdList));
 
         Long generatedUserId = database.insertInto(USER_TABLE_NAME, userValues);
+
+        userDao.addRoles(generatedUserId, manager.getRoles());
 
         List<Pair<String, Object>> employeeValues = new ArrayList<>();
         employeeValues.add(new Pair<>("position", manager.getPosition().toString()));
@@ -110,7 +110,7 @@ public class MyDatabaseProjectManagerDao implements ProjectManagerDao {
         if (projectRecord == null) {
             return null;
         }
-        Long projectManagerId = projectRecord.getLong("projectManagerId");
+        Long projectManagerId = projectRecord.getLong("managerId");
 
         return (projectManagerId != null) ? findById(projectManagerId) : null;
     }
@@ -126,7 +126,7 @@ public class MyDatabaseProjectManagerDao implements ProjectManagerDao {
 
     private ProjectManager parseRecord(Record record) {
         ProjectManagerProxy manager = new ProjectManagerProxy(projectDao, taskDao,
-                timeRequestDao, taskConfirmationDao, userDao);
+                taskConfirmationDao, userDao);
         managerMapper.map(manager, record);
         return manager;
     }
@@ -162,14 +162,6 @@ public class MyDatabaseProjectManagerDao implements ProjectManagerDao {
 
     public void setTaskDao(TaskDao taskDao) {
         this.taskDao = taskDao;
-    }
-
-    public TimeRequestDao getTimeRequestDao() {
-        return timeRequestDao;
-    }
-
-    public void setTimeRequestDao(TimeRequestDao timeRequestDao) {
-        this.timeRequestDao = timeRequestDao;
     }
 
     public ProjectDao getProjectDao() {

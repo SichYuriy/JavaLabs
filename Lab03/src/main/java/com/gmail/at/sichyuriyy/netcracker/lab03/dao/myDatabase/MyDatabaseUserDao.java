@@ -1,4 +1,4 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Role;
@@ -25,6 +25,10 @@ public class MyDatabaseUserDao implements UserDao {
     private EmployeeDao employeeDao;
     private ProjectManagerDao projectManagerDao;
     private CustomerDao customerDao;
+
+    public MyDatabaseUserDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public User findById(Long id) {
@@ -96,6 +100,7 @@ public class MyDatabaseUserDao implements UserDao {
         filters.add(new Pair<>("userId", userId));
         filters.add(new Pair<>("roleId", roleId));
 
+        database.deleteFrom(USER_ROLE_TABLE_NAME, filters);
     }
 
     @Override

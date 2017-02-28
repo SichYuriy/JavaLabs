@@ -1,10 +1,10 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.CustomerDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.ProjectDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.ProjectManagerDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.SprintDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.ProjectMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.ProjectMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Project;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.ProjectProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
@@ -31,12 +31,16 @@ public class MyDatabaseProjectDao implements ProjectDao {
     private CustomerDao customerDao;
     private SprintDao sprintDao;
 
+    public MyDatabaseProjectDao(Database database) {
+        this.database = database;
+    }
+
     @Override
     public void create(Project project) {
         List<Pair<String, Object>> values = mapValues(project);
 
         if (!(project.getProjectManager() == null)) {
-            values.add(new Pair<>("projectManagerId", project.getProjectManager().getId()));
+            values.add(new Pair<>("managerId", project.getProjectManager().getId()));
         }
         values.add(new Pair<>("customerId", project.getCustomer().getId()));
 
@@ -128,7 +132,7 @@ public class MyDatabaseProjectDao implements ProjectDao {
                 customerDao, sprintDao);
         projectMapper.map(projectProxy, record);
         setProxies(projectProxy, record);
-        return null;
+        return projectProxy;
     }
 
     private void setProxies(ProjectProxy proxy, Record record) {
@@ -142,8 +146,8 @@ public class MyDatabaseProjectDao implements ProjectDao {
         values.add(new Pair<>("name", project.getName()));
         values.add(new Pair<>("startDate", project.getStartDate()));
         values.add(new Pair<>("endDate", project.getEndDate()));
-        values.add(new Pair<>("plannedStartDate", project.getPlanedStartDate()));
-        values.add(new Pair<>("plannedEndDate", project.getPlanedEndDate()));
+        values.add(new Pair<>("plannedStartDate", project.getPlannedStartDate()));
+        values.add(new Pair<>("plannedEndDate", project.getPlannedEndDate()));
 
         return values;
     }

@@ -1,9 +1,9 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.ProjectDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.SprintDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.SprintMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.SprintMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Sprint;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.SprintProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
@@ -28,6 +28,10 @@ public class MyDatabaseSprintDao implements SprintDao {
 
     private ProjectDao projectDao;
     private TaskDao taskDao;
+
+    public MyDatabaseSprintDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void create(Sprint sprint) {
@@ -138,8 +142,8 @@ public class MyDatabaseSprintDao implements SprintDao {
         values.add(new Pair<>("name", sprint.getName()));
         values.add(new Pair<>("startDate", sprint.getStartDate()));
         values.add(new Pair<>("endDate", sprint.getEndDate()));
-        values.add(new Pair<>("plannedStartDate", sprint.getPlanedStartDate()));
-        values.add(new Pair<>("plannedEndDate", sprint.getPlanedEndDate()));
+        values.add(new Pair<>("plannedStartDate", sprint.getPlannedStartDate()));
+        values.add(new Pair<>("plannedEndDate", sprint.getPlannedEndDate()));
         values.add(new Pair<>("finished", sprint.getFinished()));
         return values;
     }

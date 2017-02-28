@@ -1,9 +1,9 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.ProjectManagerDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskDao;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TimeRequestDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.TimeRequestMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.TimeRequestMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TimeRequest;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.TimeRequestProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
@@ -29,6 +29,10 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
 
     private ProjectManagerDao projectManagerDao;
     private TaskDao taskDao;
+
+    public MyDatabaseTimeRequestDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void create(TimeRequest request) {
@@ -69,7 +73,7 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
     @Override
     public List<TimeRequest> findByProjectManagerId(Long id) {
         List<Record> requestRecords = database.selectFrom(TIME_REQUEST_TABLE_NAME,
-                "projectMangerId", id);
+                "projectManagerId", id);
         return requestRecords.stream()
                 .map(this::parseRecord)
                 .collect(Collectors.toList());
@@ -89,7 +93,7 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
         List<Record> taskIdRecords = database.selectFrom(TASK_EMPLOYEE_TABLE_NAME,
                 "employeeId", id);
         return taskIdRecords.stream()
-                .map(taskIdRecord -> taskIdRecord.getLong("id"))
+                .map(taskIdRecord -> taskIdRecord.getLong("taskId"))
                 .map(this::findByTaskId)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
@@ -116,5 +120,19 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
         proxy.setTaskId(record.getLong("taskId"));
     }
 
+    public ProjectManagerDao getProjectManagerDao() {
+        return projectManagerDao;
+    }
 
+    public void setProjectManagerDao(ProjectManagerDao projectManagerDao) {
+        this.projectManagerDao = projectManagerDao;
+    }
+
+    public TaskDao getTaskDao() {
+        return taskDao;
+    }
+
+    public void setTaskDao(TaskDao taskDao) {
+        this.taskDao = taskDao;
+    }
 }

@@ -1,13 +1,7 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.EmployeeDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.SprintDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskConfirmationDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.TaskDao;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Sprint;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TaskConfirmation;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.*;
 
 import java.util.List;
 
@@ -20,6 +14,7 @@ public class TaskProxy extends Task {
     private TaskDao taskDao;
     private TaskConfirmationDao taskConfirmationDao;
     private SprintDao sprintDao;
+    private TimeRequestDao timeRequestDao;
 
     private boolean parentTaskLoaded;
     private boolean employeesLoaded;
@@ -27,17 +22,20 @@ public class TaskProxy extends Task {
     private boolean dependenciesLoaded;
     private boolean taskConfirmationsLoaded;
     private boolean sprintLoaded;
+    private boolean timeRequestsLoaded;
 
     private Long parentTaskId;
     private Long sprintId;
 
     public TaskProxy(EmployeeDao employeeDao, TaskDao taskDao,
                      TaskConfirmationDao taskConfirmationDao,
-                     SprintDao sprintDao) {
+                     SprintDao sprintDao,
+                     TimeRequestDao timeRequestDao) {
         this.employeeDao = employeeDao;
         this.taskDao = taskDao;
         this.taskConfirmationDao = taskConfirmationDao;
         this.sprintDao = sprintDao;
+        this.timeRequestDao = timeRequestDao;
     }
 
     @Override
@@ -124,6 +122,20 @@ public class TaskProxy extends Task {
         super.setSprint(sprint);
     }
 
+    @Override
+    public List<TimeRequest> getTimeRequests() {
+        if (!timeRequestsLoaded) {
+            loadTimeRequests();
+        }
+        return super.getTimeRequests();
+    }
+
+    @Override
+    public void setTimeRequests(List<TimeRequest> timeRequests) {
+        timeRequestsLoaded = true;
+        super.setTimeRequests(timeRequests);
+    }
+
     public Long getSprintId() {
         return sprintId;
     }
@@ -174,5 +186,9 @@ public class TaskProxy extends Task {
             task = taskDao.findByChildTaskId(getId());
         }
         this.setParentTask(task);
+    }
+
+    private void loadTimeRequests() {
+        this.setTimeRequests(timeRequestDao.findByTaskId(getId()));
     }
 }

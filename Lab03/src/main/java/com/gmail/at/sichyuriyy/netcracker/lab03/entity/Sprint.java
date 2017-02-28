@@ -14,8 +14,8 @@ public class Sprint implements Serializable {
     private Project project;
     private List<Task> tasks;
     private Boolean finished;
-    private Date planedStartDate;
-    private Date planedEndDate;
+    private Date plannedStartDate;
+    private Date plannedEndDate;
     private Date startDate;
     private Date endDate;
     private Sprint previousSprint;
@@ -61,20 +61,20 @@ public class Sprint implements Serializable {
         this.finished = finished;
     }
 
-    public Date getPlanedStartDate() {
-        return planedStartDate;
+    public Date getPlannedStartDate() {
+        return plannedStartDate;
     }
 
-    public void setPlanedStartDate(Date planedStartDate) {
-        this.planedStartDate = planedStartDate;
+    public void setPlannedStartDate(Date plannedStartDate) {
+        this.plannedStartDate = plannedStartDate;
     }
 
-    public Date getPlanedEndDate() {
-        return planedEndDate;
+    public Date getPlannedEndDate() {
+        return plannedEndDate;
     }
 
-    public void setPlanedEndDate(Date planedEndDate) {
-        this.planedEndDate = planedEndDate;
+    public void setPlannedEndDate(Date plannedEndDate) {
+        this.plannedEndDate = plannedEndDate;
     }
 
     public Date getStartDate() {
@@ -117,8 +117,8 @@ public class Sprint implements Serializable {
                 ", project=" + project +
                 ", tasks=" + tasks +
                 ", finished=" + finished +
-                ", planedStartDate=" + planedStartDate +
-                ", planedEndDate=" + planedEndDate +
+                ", plannedStartDate=" + plannedStartDate +
+                ", plannedEndDate=" + plannedEndDate +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 '}';

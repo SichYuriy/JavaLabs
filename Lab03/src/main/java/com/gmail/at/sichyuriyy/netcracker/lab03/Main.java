@@ -1,6 +1,7 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Role;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.DataType;
 import javafx.beans.binding.IntegerExpression;
 import javafx.util.Pair;
 
@@ -20,11 +21,13 @@ public class Main {
 
 
     public static void main(String[] args) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("key", null);
-        System.out.println(map.get("key"));
-        Object o = null;
-        System.out.println(o);
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("key", null);
+//        System.out.println(map.get("key"));
+//        Object o = null;
+//        System.out.println(o);
+        System.out.println();
+        DataType a = DataType.BOOLEAN;
     }
 
 

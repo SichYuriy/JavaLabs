@@ -12,24 +12,20 @@ public class ProjectManagerProxy extends ProjectManager {
 
     private ProjectDao projectDao;
     private TaskDao taskDao;
-    private TimeRequestDao timeRequestDao;
     private TaskConfirmationDao taskConfirmationDao;
     private UserDao userDao;
 
     private boolean managedProjectsLoaded;
     private boolean tasksLoaded;
-    private boolean timeRequestsLoaded;
     private boolean taskConfirmationsLoaded;
     private boolean rolesLoaded;
 
     public ProjectManagerProxy(ProjectDao projectDao,
                                TaskDao taskDao,
-                               TimeRequestDao timeRequestDao,
                                TaskConfirmationDao taskConfirmationDao,
                                UserDao userDao) {
         this.projectDao = projectDao;
         this.taskDao = taskDao;
-        this.timeRequestDao = timeRequestDao;
         this.taskConfirmationDao = taskConfirmationDao;
         this.userDao = userDao;
     }
@@ -60,20 +56,6 @@ public class ProjectManagerProxy extends ProjectManager {
     public void setTasks(List<Task> tasks) {
         tasksLoaded = true;
         super.setTasks(tasks);
-    }
-
-    @Override
-    public List<TimeRequest> getTimeRequests() {
-        if (!timeRequestsLoaded) {
-            loadTimeRequests();
-        }
-        return super.getTimeRequests();
-    }
-
-    @Override
-    public void setTimeRequests(List<TimeRequest> timeRequests) {
-        timeRequestsLoaded = true;
-        super.setTimeRequests(timeRequests);
     }
 
     @Override
@@ -110,11 +92,6 @@ public class ProjectManagerProxy extends ProjectManager {
 
     private void loadTasks() {
         this.setTasks(taskDao.findByEmployeeId(getId()));
-    }
-
-    private void loadTimeRequests() {
-        this.setTimeRequests(timeRequestDao.findByEmployeeId(getId()));
-
     }
 
     private void loadTaskConfirmations() {

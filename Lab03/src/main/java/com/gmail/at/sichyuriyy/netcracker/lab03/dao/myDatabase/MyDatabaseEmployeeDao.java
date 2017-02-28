@@ -1,7 +1,7 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase;
+package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.myDatabase.mapper.EmployeeMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.EmployeeMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.EmployeeProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
@@ -21,7 +21,6 @@ public class MyDatabaseEmployeeDao implements EmployeeDao {
     private static final String USER_TABLE_NAME = "User";
     private static final String EMPLOYEE_TABLE_NAME = "Employee";
     private static final String TASK_CONFIRMATION_TABLE_NAME = "TaskConfirmation";
-    private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
     private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
 
 
@@ -34,22 +33,22 @@ public class MyDatabaseEmployeeDao implements EmployeeDao {
     private TimeRequestDao timeRequestDao;
     private UserDao userDao;
 
+    public MyDatabaseEmployeeDao(Database database) {
+        this.database = database;
+    }
 
     @Override
     public void create(Employee emp) {
         List<Pair<String, Object>> userValues = new ArrayList<>();
 
-        List<Long> roleIdList = emp.getRoles().stream()
-                .map((r) -> (long) r.ordinal())
-                .collect(Collectors.toList());
-
         userValues.add(new Pair<>("firstName", emp.getFirstName()));
         userValues.add(new Pair<>("lastName", emp.getLastName()));
         userValues.add(new Pair<>("login", emp.getLogin()));
         userValues.add(new Pair<>("password", emp.getPassword()));
-        userValues.add(new Pair<>("roles", roleIdList));
 
         Long generatedUserId = database.insertInto(USER_TABLE_NAME, userValues);
+
+        userDao.addRoles(generatedUserId, emp.getRoles());
 
         List<Pair<String, Object>> employeeValues = new ArrayList<>();
         employeeValues.add(new Pair<>("position", emp.getPosition().toString()));
@@ -128,17 +127,6 @@ public class MyDatabaseEmployeeDao implements EmployeeDao {
                 .map((record) -> record.getLong("employeeId"))
                 .map(this::findById)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Employee findByTimeRequestId(Long id) {
-        Record timeRequest = database.selectFrom(TIME_REQUEST_TABLE_NAME, id);
-        if (timeRequest == null) {
-            return null;
-        }
-        Long employeeId = timeRequest.getLong("employeeId");
-
-        return (employeeId != null) ? findById(employeeId) : null;
     }
 
     public Database getDatabase() {

@@ -276,7 +276,7 @@ public class CollectionsDatabase implements Database {
 
     @Override
     public boolean tableExists(String tableName) {
-        return tables.get(tableName) != null;
+        return tables.containsKey(tableName);
     }
 
     private void updateRow(Map<String, Object> row, List<Pair<String, Object>> values) {

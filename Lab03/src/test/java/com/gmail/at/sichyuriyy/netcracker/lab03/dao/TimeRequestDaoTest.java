@@ -38,10 +38,10 @@ public abstract class TimeRequestDaoTest {
 
     @Test
     public void create() {
-        ProjectManager projectManager = TestData.getProjectManager();
         Task task = TestData.getTask(FakeData.getSprint(1L));
-        TimeRequest timeRequest = TestData.getTimeRequest(projectManager, task);
+        TimeRequest timeRequest = TestData.getTimeRequest(task);
 
+        databaseConnector.getTaskDao().create(task);
         timeRequestDao.create(timeRequest);
 
         TimeRequest dbTimeRequest = timeRequestDao.findById(timeRequest.getId());
@@ -51,9 +51,8 @@ public abstract class TimeRequestDaoTest {
 
     @Test
     public void delete() {
-        ProjectManager projectManager = TestData.getProjectManager();
         Task task = TestData.getTask(FakeData.getSprint(1L));
-        TimeRequest timeRequest = TestData.getTimeRequest(projectManager, task);
+        TimeRequest timeRequest = TestData.getTimeRequest(task);
 
         timeRequestDao.create(timeRequest);
         assertNotNull(timeRequestDao.findById(timeRequest.getId()));
@@ -63,14 +62,12 @@ public abstract class TimeRequestDaoTest {
 
     @Test
     public void findAll() {
-        ProjectManager projectManager = TestData.getProjectManager();
         Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
         Task task2 = TestData.getTask("task2", FakeData.getSprint(1L));
 
-        TimeRequest timeRequest1 = TestData.getTimeRequest(projectManager, task1);
-        TimeRequest timeRequest2 = TestData.getTimeRequest(projectManager, task2);
+        TimeRequest timeRequest1 = TestData.getTimeRequest(task1);
+        TimeRequest timeRequest2 = TestData.getTimeRequest(task2);
 
-        databaseConnector.getProjectManagerDao().create(projectManager);
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
         timeRequestDao.create(timeRequest1);
@@ -90,10 +87,10 @@ public abstract class TimeRequestDaoTest {
 
     @Test
     public void update() {
-        ProjectManager projectManager = TestData.getProjectManager();
         Task task = TestData.getTask(FakeData.getSprint(1L));
-        TimeRequest timeRequest = TestData.getTimeRequest(projectManager, task);
+        TimeRequest timeRequest = TestData.getTimeRequest(task);
 
+        databaseConnector.getTaskDao().create(task);
         timeRequestDao.create(timeRequest);
         timeRequest.setRequestTime(99);
         timeRequest.setResponseTime(98);
@@ -109,16 +106,24 @@ public abstract class TimeRequestDaoTest {
     public void findByProjectManagerId() {
         ProjectManager projectManager1 = TestData.getProjectManager("pm1");
         ProjectManager projectManager2 = TestData.getProjectManager("pm2");
-        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
-        Task task2 = TestData.getTask("task2", FakeData.getSprint(1L));
-        Task task3 = TestData.getTask("task3", FakeData.getSprint(2L));
+        Project project1 = TestData.getProject("project1",FakeData.getCustomer(1L), projectManager1);
+        Project project2 = TestData.getProject("project2",FakeData.getCustomer(1L), projectManager2);
+        Sprint sprint1 = TestData.getSprint("pr1->sprint1", project1);
+        Sprint sprint2 = TestData.getSprint("pr2->sprint1", project2);
+        Task task1 = TestData.getTask("task1", sprint1);
+        Task task2 = TestData.getTask("task2", sprint1);
+        Task task3 = TestData.getTask("task3", sprint2);
 
-        TimeRequest timeRequest1 = TestData.getTimeRequest(projectManager1, task1);
-        TimeRequest timeRequest2 = TestData.getTimeRequest(projectManager1, task2);
-        TimeRequest timeRequest3 = TestData.getTimeRequest(projectManager2, task3);
+        TimeRequest timeRequest1 = TestData.getTimeRequest(task1);
+        TimeRequest timeRequest2 = TestData.getTimeRequest(task2);
+        TimeRequest timeRequest3 = TestData.getTimeRequest(task3);
 
         databaseConnector.getProjectManagerDao().create(projectManager1);
         databaseConnector.getProjectManagerDao().create(projectManager2);
+        databaseConnector.getProjectDao().create(project1);
+        databaseConnector.getProjectDao().create(project2);
+        databaseConnector.getSprintDao().create(sprint1);
+        databaseConnector.getSprintDao().create(sprint2);
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
         databaseConnector.getTaskDao().create(task3);
@@ -140,16 +145,13 @@ public abstract class TimeRequestDaoTest {
 
     @Test
     public void findByTaskId() {
-        ProjectManager projectManager = TestData.getProjectManager();
         Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
         Task task2 = TestData.getTask("task2", FakeData.getSprint(1L));
 
-        TimeRequest timeRequest1 = TestData.getTimeRequest(projectManager, task1);
-        TimeRequest timeRequest2 = TestData.getTimeRequest(projectManager, task1);
-        TimeRequest timeRequest3 = TestData.getTimeRequest(projectManager, task2);
+        TimeRequest timeRequest1 = TestData.getTimeRequest(task1);
+        TimeRequest timeRequest2 = TestData.getTimeRequest(task1);
+        TimeRequest timeRequest3 = TestData.getTimeRequest(task2);
 
-        databaseConnector.getProjectManagerDao().create(projectManager);
-        databaseConnector.getProjectManagerDao().create(projectManager);
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
         timeRequestDao.create(timeRequest1);
@@ -176,8 +178,8 @@ public abstract class TimeRequestDaoTest {
         Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
         Task task2 = TestData.getTask("task2", FakeData.getSprint(1L));
 
-        TimeRequest timeRequest1 = TestData.getTimeRequest(projectManager, task1);
-        TimeRequest timeRequest2 = TestData.getTimeRequest(projectManager, task2);
+        TimeRequest timeRequest1 = TestData.getTimeRequest(task1);
+        TimeRequest timeRequest2 = TestData.getTimeRequest(task2);
 
         databaseConnector.getEmployeeDao().create(employee);
         databaseConnector.getProjectManagerDao().create(projectManager);
@@ -208,8 +210,7 @@ public abstract class TimeRequestDaoTest {
         assertEquals(expected.getReason(), actual.getReason());
         assertEquals(expected.getRequestTime(), actual.getRequestTime());
         assertEquals(expected.getResponseTime(), actual.getResponseTime());
-        assertEquals(expected.getManager().getId(), expected.getManager().getId());
-        assertEquals(expected.getTask().getId(), expected.getManager().getId());
+        assertEquals(expected.getTask().getId(), actual.getTask().getId());
     }
 
     private boolean weakEquals(TimeRequest expected, TimeRequest actual) {
@@ -218,7 +219,6 @@ public abstract class TimeRequestDaoTest {
                 && Objects.equals(expected.getReason(), actual.getReason())
                 && Objects.equals(expected.getRequestTime(), actual.getRequestTime())
                 && Objects.equals(expected.getResponseTime(), actual.getResponseTime())
-                && expected.getManager().getId().equals(actual.getManager().getId())
                 && expected.getTask().getId().equals(actual.getTask().getId());
     }
 

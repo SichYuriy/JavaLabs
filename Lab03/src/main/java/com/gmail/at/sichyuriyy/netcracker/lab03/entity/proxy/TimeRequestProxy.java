@@ -28,20 +28,6 @@ public class TimeRequestProxy extends TimeRequest {
     }
 
     @Override
-    public ProjectManager getManager() {
-        if (!managerLoaded) {
-            loadManager();
-        }
-        return super.getManager();
-    }
-
-    @Override
-    public void setManager(ProjectManager employee) {
-        managerLoaded = true;
-        super.setManager(employee);
-    }
-
-    @Override
     public Task getTask() {
         if (!taskLoaded) {
             loadTask();
@@ -69,16 +55,6 @@ public class TimeRequestProxy extends TimeRequest {
 
     public void setTaskId(Long taskId) {
         this.taskId = taskId;
-    }
-
-    private void loadManager() {
-        ProjectManager manager;
-        if (managerId != null) {
-            manager = projectManagerDao.findById(managerId);
-        } else {
-            manager = projectManagerDao.findByTimeRequestId(getId());
-        }
-        this.setManager(manager);
     }
 
     private void loadTask() {

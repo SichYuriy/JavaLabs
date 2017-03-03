@@ -12,7 +12,6 @@ public class TimeRequest {
     }
 
     private Long id;
-    private ProjectManager manager;
     private Task task;
     private Integer requestTime;
     private Integer responseTime;
@@ -25,14 +24,6 @@ public class TimeRequest {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public ProjectManager getManager() {
-        return manager;
-    }
-
-    public void setManager(ProjectManager manager) {
-        this.manager = manager;
     }
 
     public Task getTask() {
@@ -79,7 +70,6 @@ public class TimeRequest {
     public String toString() {
         return "TimeRequest{" +
                 "id=" + id +
-                ", manager=" + manager +
                 ", task=" + task +
                 ", requestTime=" + requestTime +
                 ", responseTime=" + responseTime +

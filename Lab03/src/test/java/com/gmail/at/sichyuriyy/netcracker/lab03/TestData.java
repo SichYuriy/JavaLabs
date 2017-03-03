@@ -120,10 +120,9 @@ public class TestData {
         return getTask("taskName", sprint);
     }
 
-    public static TimeRequest getTimeRequest(ProjectManager projectManager, Task task) {
+    public static TimeRequest getTimeRequest(Task task) {
         TimeRequest timeRequest = new TimeRequest();
         timeRequest.setStatus(TimeRequest.Status.ACCEPTED);
-        timeRequest.setManager(projectManager);
         timeRequest.setTask(task);
         timeRequest.setReason("slowpoke");
         timeRequest.setRequestTime(24);

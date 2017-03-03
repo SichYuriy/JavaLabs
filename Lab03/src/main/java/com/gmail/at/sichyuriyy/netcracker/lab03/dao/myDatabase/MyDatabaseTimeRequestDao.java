@@ -22,6 +22,12 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
 
     private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
     private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
+    private static final String SPRINT_TABLE_NAME = "Sprint";
+    private static final String PROJECT_TABLE_NAME = "Project";
+    private static final String TASK_TABLE_NAME = "Task";
+
+
+
 
     private TimeRequestMapper timeRequestMapper = new TimeRequestMapper();
 
@@ -37,7 +43,6 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
     @Override
     public void create(TimeRequest request) {
         List<Pair<String, Object>> values = mapValues(request);
-        values.add(new Pair<>("projectManagerId", request.getManager().getId()));
         values.add(new Pair<>("taskId", request.getTask().getId()));
 
         Long generatedId = database.insertInto(TIME_REQUEST_TABLE_NAME, values);
@@ -71,11 +76,30 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
     }
 
     @Override
+    public List<TimeRequest> findByProjectId(Long id) {
+        List<Record> sprintRecords = database.selectFrom(SPRINT_TABLE_NAME,
+                "projectId", id);
+
+        return sprintRecords.stream()
+                .map(sprintRecord -> database.selectFrom(
+                                        TASK_TABLE_NAME,
+                                        "sprintId",
+                                        sprintRecord.getLong("id")))
+                .flatMap(List::stream)
+                .map(taskRecord -> taskRecord.getLong("id"))
+                .map(this::findByTaskId)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<TimeRequest> findByProjectManagerId(Long id) {
-        List<Record> requestRecords = database.selectFrom(TIME_REQUEST_TABLE_NAME,
-                "projectManagerId", id);
-        return requestRecords.stream()
-                .map(this::parseRecord)
+        List<Record> projectRecords = database.selectFrom(PROJECT_TABLE_NAME,
+                "managerId", id);
+        return projectRecords.stream()
+                .map(projectRecord -> projectRecord.getLong("id"))
+                .map(this::findByProjectId)
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
 

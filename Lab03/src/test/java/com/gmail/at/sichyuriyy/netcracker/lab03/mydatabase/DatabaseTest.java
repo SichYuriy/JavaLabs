@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,8 +23,8 @@ public abstract class DatabaseTest {
 
     private Database database;
 
-    protected abstract Database getTestedDatabase();
-    protected abstract void releaseResources();
+    protected abstract Database getTestedDatabase() throws IOException;
+    protected abstract void releaseResources() throws IOException;
 
     @Before
     public void setUp() throws Exception {

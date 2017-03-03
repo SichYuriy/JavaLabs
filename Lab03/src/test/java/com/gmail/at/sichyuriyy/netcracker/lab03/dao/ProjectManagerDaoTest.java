@@ -115,12 +115,19 @@ public abstract class ProjectManagerDaoTest {
 
     @Test
     public void findByTimeRequestId() {
-        Task fakeTask = FakeData.getTask(1L);
         ProjectManager projectManager = TestData.getProjectManager();
-        TimeRequest timeRequest = TestData.getTimeRequest(projectManager, fakeTask);
+        Project project = TestData.getProject(FakeData.getCustomer(1L), projectManager);
+        Sprint sprint = TestData.getSprint(project);
+        Task task = TestData.getTask(sprint);
 
+        TimeRequest timeRequest = TestData.getTimeRequest(task);
         projectManagerDao.create(projectManager);
+        databaseConnector.getProjectDao().create(project);
+        databaseConnector.getSprintDao().create(sprint);
+        databaseConnector.getTaskDao().create(task);
         databaseConnector.getTimeRequestDao().create(timeRequest);
+
+        RelationUtils.addManagedProject(projectManager, project);
 
         ProjectManager dbManager = projectManagerDao.findByTimeRequestId(timeRequest.getId());
 

@@ -99,7 +99,6 @@ public class MyDatabaseStructureCreator implements StructureCreator {
     }};
 
     private List<Pair<String, DataType>> timeRequestProperties = new ArrayList<Pair<String, DataType>>() {{
-        add(new Pair<>("projectManagerId", DataType.LONG));
         add(new Pair<>("taskId", DataType.LONG));
         add(new Pair<>("reason", DataType.STRING));
         add(new Pair<>("requestTime", DataType.INTEGER));

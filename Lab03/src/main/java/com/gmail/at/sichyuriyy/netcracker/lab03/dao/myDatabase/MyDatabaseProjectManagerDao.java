@@ -24,6 +24,10 @@ public class MyDatabaseProjectManagerDao implements ProjectManagerDao {
     private static final String USER_ROLE_TABLE_NAME = "user_role";
     private static final String ROLE_TABLE_NAME = "Role";
     private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
+    private static final String TASK_TABLE_NAME = "Task";
+    private static final String SPRINT_TABLE_NAME = "Sprint";
+
+
 
     private ProjectManagerMapper managerMapper = new ProjectManagerMapper();
 
@@ -121,7 +125,9 @@ public class MyDatabaseProjectManagerDao implements ProjectManagerDao {
         if (requestRecord == null) {
             return null;
         }
-        return findById(requestRecord.getLong("projectManagerId"));
+        Record taskRecord = database.selectFrom(TASK_TABLE_NAME, requestRecord.getLong("taskId"));
+        Record sprintRecord = database.selectFrom(SPRINT_TABLE_NAME, taskRecord.getLong("sprintId"));
+        return this.findByProjectId(sprintRecord.getLong("projectId"));
     }
 
     private ProjectManager parseRecord(Record record) {

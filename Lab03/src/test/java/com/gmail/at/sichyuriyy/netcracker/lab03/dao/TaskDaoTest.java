@@ -223,7 +223,7 @@ public abstract class TaskDaoTest {
     public void findByTimeRequestId() {
         Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
         Task task = TestData.getTask(sprint);
-        TimeRequest timeRequest = TestData.getTimeRequest(FakeData.getProjectManager(1L), task);
+        TimeRequest timeRequest = TestData.getTimeRequest(task);
 
         databaseConnector.getSprintDao().create(sprint);
         taskDao.create(task);

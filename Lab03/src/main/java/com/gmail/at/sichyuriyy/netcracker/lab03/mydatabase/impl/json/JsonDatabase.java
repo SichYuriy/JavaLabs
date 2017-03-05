@@ -52,7 +52,7 @@ public class JsonDatabase implements Database {
     public JsonDatabase(String rootDirectoryPath, boolean rewriteOldData) {
         this.root = Paths.get(rootDirectoryPath, DB_ROOT);
         this.metadataFilePath = Paths.get(rootDirectoryPath, DB_ROOT, METADATA_FILE_NAME);
-        this.tablesPath = Paths.get(rootDirectoryPath, TABLES_DIRECTORY);
+        this.tablesPath = Paths.get(rootDirectoryPath, DB_ROOT, TABLES_DIRECTORY);
         this.rewriteOldData = rewriteOldData;
     }
 
@@ -217,32 +217,96 @@ public class JsonDatabase implements Database {
 
     @Override
     public void deleteFrom(String tableName) {
-
+        checkInitialization();
+        checkTableName(tableName);
+        for (String fileName: getTablePartsNames(tableName)) {
+            Path filePath = Paths.get(tablesPath.toString(), tableName, fileName);
+            try {
+                Files.write(filePath, Collections.emptyList());
+            } catch (IOException e) {
+                throw new IllegalStateException("can not clean data file", e);
+            }
+        }
     }
 
     @Override
     public void deleteFrom(String tableName, Long id) {
-
+        checkInitialization();
+        checkTableName(tableName);
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
+        Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                "_temp_" + getTablePartName(tableName, id));
+        deleteContentFromDataFile(filePath, tempFilePath, parser,
+                map -> map.get("id").equals(id));
     }
 
     @Override
     public void deleteFrom(String tableName, String filterName, Object filterValue) {
+        checkInitialization();
+        checkTableName(tableName);
+        requestValidator.validatePropertyType(filterName, filterValue,
+                metadata.get(tableName));
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        for (String filePartName: getTablePartsNames(tableName)) {
+            Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
+            Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                    "_temp_" + filePartName);
+            deleteContentFromDataFile(filePath, tempFilePath, parser,
+                    map -> Objects.equals(map.get(filterName), filterValue));
+        }
 
     }
 
     @Override
     public void deleteFrom(String tableName, List<Pair<String, Object>> filters) {
-
+        checkInitialization();
+        checkTableName(tableName);
+        requestValidator.validatePropertiesType(filters, metadata.get(tableName));
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        for (String filePartName: getTablePartsNames(tableName)) {
+            Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
+            Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                    "_temp_" + filePartName);
+            deleteContentFromDataFile(filePath, tempFilePath, parser,
+                    map -> {
+                        for (Pair<String, Object> filterPair: filters) {
+                            if (!Objects.equals(map.get(filterPair.getKey()), filterPair.getValue())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+        }
     }
 
     @Override
     public void deleteFrom(String tableName, String filterName, Predicate filter) {
-
+        checkInitialization();
+        checkTableName(tableName);
+        requestValidator.checkProperty(filterName, metadata.get(tableName));
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        for (String filePartName: getTablePartsNames(tableName)) {
+            Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
+            Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                    "_temp_" + filePartName);
+            deleteContentFromDataFile(filePath, tempFilePath, parser,
+                    map -> filter.test(map.get(filterName)));
+        }
     }
 
     @Override
     public void deleteFrom(String tableName, List<String> filterNames, Predicate<Map<String, Object>> filter) {
-
+        checkInitialization();
+        checkTableName(tableName);
+        requestValidator.checkProperties(filterNames, metadata.get(tableName));
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        for (String filePartName: getTablePartsNames(tableName)) {
+            Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
+            Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                    "_temp_" + filePartName);
+            deleteContentFromDataFile(filePath, tempFilePath, parser, filter);
+        }
     }
 
     @Override
@@ -264,6 +328,39 @@ public class JsonDatabase implements Database {
                              List<Pair<String, Object>> filters) {
         return filters.stream()
                 .allMatch(pair -> Objects.equals(pair.getValue(), rowMap.get(pair.getKey())));
+    }
+
+    private void deleteContentFromDataFile(Path filePath, Path tempFilePath,
+                                           DomainObjectParser parser,
+                                           Predicate<Map<String, Object>> filter) {
+        try {
+            Files.createFile(tempFilePath);
+        } catch (IOException e) {
+            throw new IllegalStateException("can not create temp data file", e);
+        }
+        try (BufferedReader reader = Files.newBufferedReader(filePath);
+             BufferedWriter writer = Files.newBufferedWriter(tempFilePath)) {
+            String line = reader.readLine();
+            while (line != null) {
+                Map<String, Object> obj = parser.fromJson(gson, line);
+                if (!filter.test(obj)) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("can not update data file", e);
+        }
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            throw new IllegalStateException("can not delete old data file");
+        }
+        File tempFile = tempFilePath.toFile();
+        if (!tempFile.renameTo(filePath.toFile())) {
+            throw new IllegalStateException("can not rename temp data file");
+        }
     }
 
     private void readMetadata() {
@@ -389,7 +486,7 @@ public class JsonDatabase implements Database {
             String line = reader.readLine();
             while (line != null) {
                 Map<String, Object> obj = parser.fromJson(gson, line);
-                if (((Long)obj.get("id")).equals(id)) {
+                if (obj.get("id").equals(id)) {
                     return obj;
                 }
             }

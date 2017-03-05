@@ -174,7 +174,7 @@ public class CollectionsDatabase implements Database {
         updateRow(insertRow, values);
         Long id = table.getNextId();
         table.generateNextId();
-        insertRow.put("id",id);
+        insertRow.put("id", id);
         table.getRows().put(id, insertRow);
         return id;
     }

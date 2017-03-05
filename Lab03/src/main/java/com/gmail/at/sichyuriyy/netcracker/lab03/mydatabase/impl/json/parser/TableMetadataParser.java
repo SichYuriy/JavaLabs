@@ -30,19 +30,20 @@ public class TableMetadataParser implements JsonParser<Pair<String, Map<String, 
         String tableName;
         Map<String, DataType> properties = new HashMap<>();
 
-        JsonReader reader = gson.newJsonReader(new StringReader(str));
+        try(JsonReader reader = gson.newJsonReader(new StringReader(str))) {
+            reader.beginObject();
+            reader.nextName();
+            tableName = reader.nextString();
 
-        reader.beginObject();
-        reader.nextName();
-        tableName = reader.nextString();
-
-        reader.nextName();
-        reader.beginObject();
-        while (reader.hasNext()) {
-            String propertyName = reader.nextName();
-            DataType propertyType = DataType.valueOf(reader.nextString());
-            properties.put(propertyName, propertyType);
+            reader.nextName();
+            reader.beginObject();
+            while (reader.hasNext()) {
+                String propertyName = reader.nextName();
+                DataType propertyType = DataType.valueOf(reader.nextString());
+                properties.put(propertyName, propertyType);
+            }
         }
+
         return new Pair<>(tableName, properties);
     }
 }

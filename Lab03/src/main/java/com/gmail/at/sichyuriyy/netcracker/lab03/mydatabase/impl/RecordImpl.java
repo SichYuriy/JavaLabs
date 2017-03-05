@@ -27,6 +27,11 @@ public class RecordImpl implements Record {
         }
     }
 
+    public RecordImpl(Map<String, Object> values) {
+        leftProperties = new HashMap<>(values);
+        rightProperties = new HashMap<>();
+    }
+
     private RecordImpl() {
         leftProperties = new HashMap<>();
         rightProperties = new HashMap<>();

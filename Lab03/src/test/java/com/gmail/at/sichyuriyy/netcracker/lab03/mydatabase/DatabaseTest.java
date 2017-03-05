@@ -63,7 +63,7 @@ public abstract class DatabaseTest {
     }
 
     @Test
-    public void dropTable() throws Exception {
+    public void dropTable() {
         insertTestData(database);
         database.dropTable("table1");
         List<Pair<String, DataType>> properties = database.describeTable("table1");

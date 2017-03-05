@@ -5,7 +5,6 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.RecordImpl;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.RequestValidator;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.collections.Table;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper.DomainObjectMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper.TableMetadataMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser.DomainObjectParser;
@@ -311,12 +310,35 @@ public class JsonDatabase implements Database {
 
     @Override
     public void update(String tableName, Long id, List<Pair<String, Object>> values) {
-
+        checkInitialization();
+        checkTableName(tableName);
+        requestValidator.validateInsertUpdateRequest(values, metadata.get(tableName));
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        DomainObjectMapper mapper = DomainObjectMapper.getMapper(metadata.get(tableName));
+        Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
+        Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                "_temp_" + getTablePartName(tableName, id));
+        updateContentOfDataFile(filePath, tempFilePath, parser, mapper,
+                map -> map.get("id").equals(id),
+                values);
     }
 
     @Override
     public void update(String tableName, List<Pair<String, Object>> values, String filterName, Object filterValue) {
-
+        checkTableName(tableName);
+        requestValidator.validateInsertUpdateRequest(values, metadata.get(tableName));
+        requestValidator.validatePropertyType(filterName, filterValue,
+                metadata.get(tableName));
+        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        DomainObjectMapper mapper = DomainObjectMapper.getMapper(metadata.get(tableName));
+        for (String filePartName: getTablePartsNames(tableName)) {
+            Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
+            Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
+                    "_temp_" + filePartName);
+            updateContentOfDataFile(filePath, tempFilePath, parser, mapper,
+                    map -> Objects.equals(map.get(filterName), filterValue),
+                    values);
+        }
     }
 
     @Override
@@ -344,6 +366,47 @@ public class JsonDatabase implements Database {
             while (line != null) {
                 Map<String, Object> obj = parser.fromJson(gson, line);
                 if (!filter.test(obj)) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("can not update data file", e);
+        }
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            throw new IllegalStateException("can not delete old data file");
+        }
+        File tempFile = tempFilePath.toFile();
+        if (!tempFile.renameTo(filePath.toFile())) {
+            throw new IllegalStateException("can not rename temp data file");
+        }
+
+    }
+
+    private void updateContentOfDataFile(Path filePath, Path tempFilePath,
+                                         DomainObjectParser parser,
+                                         DomainObjectMapper mapper,
+                                         Predicate<Map<String, Object>> filter,
+                                         List<Pair<String, Object>> values) {
+        try {
+            Files.createFile(tempFilePath);
+        } catch (IOException e) {
+            throw new IllegalStateException("can not create temp data file", e);
+        }
+        try (BufferedReader reader = Files.newBufferedReader(filePath);
+             BufferedWriter writer = Files.newBufferedWriter(tempFilePath)) {
+            String line = reader.readLine();
+            while (line != null) {
+                Map<String, Object> obj = parser.fromJson(gson, line);
+                if (filter.test(obj)) {
+                    updateRow(obj, values);
+                    String newJson = mapper.toJson(gson, obj);
+                    writer.write(newJson);
+                    writer.newLine();
+                } else {
                     writer.write(line);
                     writer.newLine();
                 }

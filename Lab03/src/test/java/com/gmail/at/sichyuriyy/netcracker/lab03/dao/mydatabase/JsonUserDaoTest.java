@@ -1,32 +1,43 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.CustomerDaoTest;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.UserDaoTest;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.factory.MyDatabaseDaoFactory;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.factory.MyDatabaseDaoFactoryImpl;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.DatabaseConnector;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.impl.CollectionsDatabaseConnector;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseinit.impl.MyDatabaseStructureCreator;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.collections.CollectionsDatabase;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.JsonDatabase;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.utill.FileUtils;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by Yuriy on 25.02.2017.
+ * Created by Yuriy on 05.03.2017.
  */
-public class CollectionsCustomerDaoTest extends CustomerDaoTest {
-
+public class JsonUserDaoTest extends UserDaoTest {
+    private static final String ROOT = "JsonDatabaseRoot_UserDaoTest";
     private MyDatabaseStructureCreator structureCreator = new MyDatabaseStructureCreator();
 
     @Override
     protected DatabaseConnector getTestedDatabaseConnector() {
-        Database database = CollectionsDatabase.getCollectionsDatabase();
+        Database database = new JsonDatabase(ROOT, true);
+        database.initStorage();
         structureCreator.createTaskManagerStructure(database);
         MyDatabaseDaoFactory daoFactory = new MyDatabaseDaoFactoryImpl(database);
-        DatabaseConnector databaseConnector = new CollectionsDatabaseConnector(daoFactory);
-        return databaseConnector;
+        return new CollectionsDatabaseConnector(daoFactory);
     }
 
     @Override
     protected void cleanResources() {
-
+        try {
+            FileUtils.deleteDirRecursively(Paths.get(ROOT));
+        } catch (IOException e) {
+            throw new RuntimeException("can not clean resources", e);
+        }
     }
+
 }

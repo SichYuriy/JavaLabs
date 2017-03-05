@@ -173,7 +173,11 @@ public class MyDatabaseTaskDao implements TaskDao {
         if (childRecord == null) {
             return null;
         }
-        return findById(childRecord.getLong("parentTaskId"));
+        Long parentTaskId = childRecord.getLong("parentTaskId");
+        if (parentTaskId == null) {
+            return null;
+        }
+        return findById(parentTaskId);
     }
 
     @Override

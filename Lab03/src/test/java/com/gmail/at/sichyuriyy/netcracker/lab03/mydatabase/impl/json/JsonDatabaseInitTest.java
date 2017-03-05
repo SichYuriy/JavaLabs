@@ -86,7 +86,6 @@ public class JsonDatabaseInitTest {
 
         List<Pair<String, DataType>> expectedProperties = table2Props;
         List<Pair<String, DataType>> actualProperties = database.describeTable("table2");
-
         assertTrue(TestUtils.equalContentCollections(expectedProperties, actualProperties));
     }
 

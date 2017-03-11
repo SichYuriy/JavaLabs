@@ -1,12 +1,9 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.DataType;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser.TableMetadataParser;
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import javafx.util.Pair;
-import jdk.nashorn.internal.ir.debug.JSONWriter;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -15,13 +12,13 @@ import java.util.Map;
 /**
  * Created by Yuriy on 02.03.2017.
  */
-public class TableMetadataMapper implements JsonMapper<Pair<String, Map<String, DataType>>> {
+public class JsonMetadataMapper implements JsonMapper<Pair<String, Map<String, DataType>>> {
 
-    public static TableMetadataMapper getMapper() {
-        return new TableMetadataMapper();
+    public static JsonMetadataMapper getMapper() {
+        return new JsonMetadataMapper();
     }
 
-    private TableMetadataMapper() {
+    private JsonMetadataMapper() {
 
     }
     

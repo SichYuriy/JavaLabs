@@ -5,10 +5,10 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.RecordImpl;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.RequestValidator;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper.DomainObjectMapper;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper.TableMetadataMapper;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser.DomainObjectParser;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser.TableMetadataParser;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper.JsonObjectMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper.JsonMetadataMapper;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser.JsonObjectParser;
+import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser.JsonMetadataParser;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.utill.FileUtils;
 import com.google.gson.Gson;
 import javafx.util.Pair;
@@ -83,7 +83,7 @@ public class JsonDatabase implements Database {
             propertyMap.put(property.getKey(), property.getValue());
         }
         propertyMap.put("id", DataType.LONG);
-        String propertiesJson = TableMetadataMapper.getMapper().toJson(gson, new Pair<>(name, propertyMap));
+        String propertiesJson = JsonMetadataMapper.getMapper().toJson(gson, new Pair<>(name, propertyMap));
         try {
             Files.write(metadataFilePath, Collections.singletonList(propertiesJson), StandardOpenOption.APPEND);
         } catch (IOException e) {
@@ -95,7 +95,7 @@ public class JsonDatabase implements Database {
 
     @Override
     public void dropTable(String name) {
-        TableMetadataMapper mapper = TableMetadataMapper.getMapper();
+        JsonMetadataMapper mapper = JsonMetadataMapper.getMapper();
         checkInitialization();
         checkTableName(name);
         metadata.remove(name);
@@ -204,7 +204,7 @@ public class JsonDatabase implements Database {
         updateRow(insertRow, values);
         Long id = generateNextId(tableName);
         insertRow.put("id", id);
-        String jsonRow = DomainObjectMapper.getMapper(properties).toJson(gson, insertRow);
+        String jsonRow = JsonObjectMapper.getMapper(properties).toJson(gson, insertRow);
         Path fileTable = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
         try {
             Files.write(fileTable, Collections.singletonList(jsonRow), StandardOpenOption.APPEND);
@@ -232,7 +232,7 @@ public class JsonDatabase implements Database {
     public void deleteFrom(String tableName, Long id) {
         checkInitialization();
         checkTableName(tableName);
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
         Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                 "_temp_" + getTablePartName(tableName, id));
@@ -246,7 +246,7 @@ public class JsonDatabase implements Database {
         checkTableName(tableName);
         requestValidator.validatePropertyType(filterName, filterValue,
                 metadata.get(tableName));
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
@@ -262,7 +262,7 @@ public class JsonDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.validatePropertiesType(filters, metadata.get(tableName));
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
@@ -284,7 +284,7 @@ public class JsonDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.checkProperty(filterName, metadata.get(tableName));
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
@@ -299,7 +299,7 @@ public class JsonDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.checkProperties(filterNames, metadata.get(tableName));
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
@@ -313,8 +313,8 @@ public class JsonDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.validateInsertUpdateRequest(values, metadata.get(tableName));
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
-        DomainObjectMapper mapper = DomainObjectMapper.getMapper(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
+        JsonObjectMapper mapper = JsonObjectMapper.getMapper(metadata.get(tableName));
         Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
         Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                 "_temp_" + getTablePartName(tableName, id));
@@ -329,8 +329,8 @@ public class JsonDatabase implements Database {
         requestValidator.validateInsertUpdateRequest(values, metadata.get(tableName));
         requestValidator.validatePropertyType(filterName, filterValue,
                 metadata.get(tableName));
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
-        DomainObjectMapper mapper = DomainObjectMapper.getMapper(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
+        JsonObjectMapper mapper = JsonObjectMapper.getMapper(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
@@ -353,7 +353,7 @@ public class JsonDatabase implements Database {
     }
 
     private void deleteContentFromDataFile(Path filePath, Path tempFilePath,
-                                           DomainObjectParser parser,
+                                           JsonObjectParser parser,
                                            Predicate<Map<String, Object>> filter) {
         try {
             Files.createFile(tempFilePath);
@@ -387,8 +387,8 @@ public class JsonDatabase implements Database {
     }
 
     private void updateContentOfDataFile(Path filePath, Path tempFilePath,
-                                         DomainObjectParser parser,
-                                         DomainObjectMapper mapper,
+                                         JsonObjectParser parser,
+                                         JsonObjectMapper mapper,
                                          Predicate<Map<String, Object>> filter,
                                          List<Pair<String, Object>> values) {
         try {
@@ -437,7 +437,7 @@ public class JsonDatabase implements Database {
         Pair<String, Map<String, DataType>> table;
         for (String propertiesJson: tableJsonList) {
             try {
-                table = TableMetadataParser.getParser().fromJson(gson, propertiesJson);
+                table = JsonMetadataParser.getParser().fromJson(gson, propertiesJson);
             } catch (IOException e) {
                 throw new IllegalStateException("Metadata is corrupted", e);
             }
@@ -502,7 +502,7 @@ public class JsonDatabase implements Database {
 
     private void deleteTableFiles(String tableName) {
         try {
-            FileUtils.deleteDirRecursively(Paths.get(tablesPath.toString(),tableName));
+            FileUtils.deleteDirRecursively(Paths.get(tablesPath.toString(), tableName));
         } catch (IOException e) {
             throw new IllegalArgumentException("can not delete table files");
         }
@@ -521,7 +521,7 @@ public class JsonDatabase implements Database {
     }
 
     private List<Map<String, Object>> readAllObjects(String tableName) {
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         List<Map<String, Object>> result = new ArrayList<>();
         for (String fileName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, fileName);
@@ -543,7 +543,7 @@ public class JsonDatabase implements Database {
     }
 
     private Map<String, Object> readById(String tableName, Long id) {
-        DomainObjectParser parser = DomainObjectParser.getParser(metadata.get(tableName));
+        JsonObjectParser parser = JsonObjectParser.getParser(metadata.get(tableName));
         Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
             String line = reader.readLine();

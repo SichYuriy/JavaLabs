@@ -3,6 +3,7 @@ package com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.parser;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.DataType;
 import com.google.gson.Gson;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,11 +16,9 @@ import static org.junit.Assert.*;
 /**
  * Created by Yuriy on 05.03.2017.
  */
-public class DomainObjectParserTest {
+public class JsonObjectParserTest {
 
-    private final Map<String, DataType> properties;
 
-    private final Map<String, Object> values;
     private final String JSON_OBJECT = "{" +
             "\"date\":1," +
             "\"boolean\":false," +
@@ -29,7 +28,19 @@ public class DomainObjectParserTest {
             "\"long\":111" +
             "}";
 
-    public DomainObjectParserTest() {
+    private final String JSON_OBJECT_NULL = "{" +
+            "\"date\":1," +
+            "\"boolean\":false," +
+            "\"double\":1.1," +
+            "\"long\":111" +
+            "}";
+
+    private Map<String, DataType> properties;
+
+    private Map<String, Object> values;
+
+    @Before
+    public void setUp() throws Exception {
         properties = new HashMap<>();
         properties.put("long", DataType.LONG);
         properties.put("integer", DataType.INTEGER);
@@ -45,13 +56,27 @@ public class DomainObjectParserTest {
         values.put("date", new Date(1));
         values.put("boolean", false);
         values.put("double", 1.1d);
-    }
 
+    }
 
     @Test
     public void fromJson() throws IOException {
-        DomainObjectParser parser = DomainObjectParser.getParser(properties);
+        JsonObjectParser parser = JsonObjectParser.getParser(properties);
         Map<String, Object> actual = parser.fromJson(new Gson(), JSON_OBJECT);
+
+        assertTrue(TestUtils.equalContentCollections(
+                values.entrySet(),
+                actual.entrySet()
+        ));
+    }
+
+    @Test
+    public void fromJsonNull() throws IOException {
+        JsonObjectParser parser = JsonObjectParser.getParser(properties);
+        Map<String, Object> actual = parser.fromJson(new Gson(), JSON_OBJECT_NULL);
+
+        values.put("string", null);
+        values.put("integer", null);
 
         assertTrue(TestUtils.equalContentCollections(
                 values.entrySet(),

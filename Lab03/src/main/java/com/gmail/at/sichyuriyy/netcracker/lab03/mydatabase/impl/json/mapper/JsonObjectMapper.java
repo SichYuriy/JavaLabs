@@ -10,11 +10,11 @@ import java.sql.Date;
 /**
  * Created by Yuriy on 03.03.2017.
  */
-public class DomainObjectMapper implements JsonMapper<Map<String, Object>> {
+public class JsonObjectMapper implements JsonMapper<Map<String, Object>> {
 
     private Set<String> dataValues;
 
-    private DomainObjectMapper(Map<String, DataType> properties) {
+    private JsonObjectMapper(Map<String, DataType> properties) {
         dataValues = new HashSet<>();
         for (String key: properties.keySet()) {
             if (properties.get(key).equals(DataType.DATE)) {
@@ -23,16 +23,19 @@ public class DomainObjectMapper implements JsonMapper<Map<String, Object>> {
         }
     }
 
-    public static DomainObjectMapper getMapper(Map<String, DataType> properties) {
-        return new DomainObjectMapper(properties);
+    public static JsonObjectMapper getMapper(Map<String, DataType> properties) {
+        return new JsonObjectMapper(properties);
     }
 
     @Override
     public String toJson(Gson gson, Map<String, Object> obj) {
         Map<String, Object> copy = new HashMap<>(obj);
         for (String dataProperty: dataValues) {
-            Long longData = ((Date)copy.get(dataProperty)).getTime();
-            copy.put(dataProperty, longData);
+            if (copy.get(dataProperty) != null) {
+                Long longData = ((Date)copy.get(dataProperty)).getTime();
+                copy.put(dataProperty, longData);
+            }
+
         }
         return gson.toJson(copy);
     }

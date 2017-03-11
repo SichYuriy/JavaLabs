@@ -6,8 +6,6 @@ import com.google.gson.Gson;
 import javafx.util.Pair;
 import org.junit.Test;
 
-import javax.xml.crypto.Data;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +35,7 @@ public class TableMetadataParserTest {
 
     @Test
     public void fromJson() throws Exception {
-        TableMetadataParser parser = TableMetadataParser.getParser();
+        JsonMetadataParser parser = JsonMetadataParser.getParser();
         Pair<String, Map<String, DataType>> table = parser.fromJson(new Gson(), TABLE_JSON1);
 
         assertEquals(TABLE_NAME, table.getKey());

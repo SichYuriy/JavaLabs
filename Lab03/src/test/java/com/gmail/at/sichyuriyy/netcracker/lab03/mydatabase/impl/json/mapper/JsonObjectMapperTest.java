@@ -2,6 +2,7 @@ package com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.json.mapper;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.DataType;
 import com.google.gson.Gson;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Date;
@@ -13,11 +14,9 @@ import static org.junit.Assert.*;
 /**
  * Created by Yuriy on 03.03.2017.
  */
-public class DomainObjectMapperTest {
+public class JsonObjectMapperTest {
 
-    private final Map<String, DataType> properties;
 
-    private final Map<String, Object> values;
     private final String JSON_OBJECT = "{" +
             "\"date\":1," +
             "\"boolean\":false," +
@@ -27,7 +26,19 @@ public class DomainObjectMapperTest {
             "\"long\":111" +
             "}";
 
-    public DomainObjectMapperTest() {
+    private final String JSON_OBJECT_NULL = "{" +
+            "\"date\":1," +
+            "\"boolean\":false," +
+            "\"double\":1.1," +
+            "\"long\":111" +
+            "}";
+
+    private Map<String, DataType> properties;
+
+    private Map<String, Object> values;
+
+    @Before
+    public void setUp() throws Exception {
         properties = new HashMap<>();
         properties.put("long", DataType.LONG);
         properties.put("integer", DataType.INTEGER);
@@ -43,13 +54,24 @@ public class DomainObjectMapperTest {
         values.put("date", new Date(1));
         values.put("boolean", false);
         values.put("double", 1.1d);
+
     }
 
     @Test
     public void toJson() {
-        DomainObjectMapper mapper = DomainObjectMapper.getMapper(properties);
+        JsonObjectMapper mapper = JsonObjectMapper.getMapper(properties);
         String actual = mapper.toJson(new Gson(), values);
         assertEquals(JSON_OBJECT, actual);
+    }
+
+    @Test
+    public void toJsonNull() {
+        JsonObjectMapper mapper = JsonObjectMapper.getMapper(properties);
+        values.put("integer", null);
+        values.put("string", null);
+        String actual = mapper.toJson(new Gson(), values);
+
+        assertEquals(JSON_OBJECT_NULL, actual);
     }
 
 }

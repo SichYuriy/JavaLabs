@@ -37,7 +37,7 @@ public class JsonSprintDaoTest extends SprintDaoTest {
         try {
             FileUtils.deleteDirRecursively(Paths.get(ROOT));
         } catch (IOException e) {
-            throw new RuntimeException("can not clean resources", e);
+            cleanResources();
         }
     }
 

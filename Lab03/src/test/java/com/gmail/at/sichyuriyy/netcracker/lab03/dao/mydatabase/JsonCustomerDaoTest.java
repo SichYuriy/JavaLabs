@@ -35,7 +35,7 @@ public class JsonCustomerDaoTest extends CustomerDaoTest {
         try {
             FileUtils.deleteDirRecursively(Paths.get(ROOT));
         } catch (IOException e) {
-            throw new RuntimeException("can not clean resources", e);
+            cleanResources();
         }
     }
 }

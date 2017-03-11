@@ -13,13 +13,13 @@ import java.util.Map;
 /**
  * Created by Yuriy on 02.03.2017.
  */
-public class TableMetadataParser implements JsonParser<Pair<String, Map<String, DataType>>> {
+public class JsonMetadataParser implements JsonParser<Pair<String, Map<String, DataType>>> {
 
-    public static TableMetadataParser getParser() {
-        return new TableMetadataParser();
+    public static JsonMetadataParser getParser() {
+        return new JsonMetadataParser();
     }
 
-    private TableMetadataParser() {
+    private JsonMetadataParser() {
 
     }
 

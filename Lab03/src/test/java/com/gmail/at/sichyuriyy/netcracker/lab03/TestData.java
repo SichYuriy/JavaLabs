@@ -54,7 +54,7 @@ public class TestData {
         employee.setLastName("lastName");
         employee.setLogin("login");
         employee.setPassword("123321");
-        employee.setPosition(Employee.EmployeePosition.JUNIOR);
+        employee.setPosition(Employee.Position.JUNIOR);
         return employee; 
     }
 
@@ -72,7 +72,7 @@ public class TestData {
         projectManager.setLastName("lastName");
         projectManager.setLogin("login");
         projectManager.setPassword("123321");
-        projectManager.setPosition(Employee.EmployeePosition.SENIOR);
+        projectManager.setPosition(Employee.Position.SENIOR);
         return projectManager;
     }
 
@@ -80,11 +80,9 @@ public class TestData {
         return getProjectManager("firstNamePM");
     }
 
-    public static TaskConfirmation getTaskConfirmation(Employee employee, Task task) {
+    public static TaskConfirmation getTaskConfirmation() {
         TaskConfirmation taskConfirmation = new TaskConfirmation();
-        taskConfirmation.setEmployee(employee);
-        taskConfirmation.setTask(task);
-        taskConfirmation.setStatus(TaskConfirmation.ConfirmationStatus.UNCONFIRMED);
+        taskConfirmation.setStatus(TaskConfirmation.Status.UNCONFIRMED);
         return taskConfirmation;
     }
 
@@ -109,8 +107,8 @@ public class TestData {
         Task task = new Task();
         task.setName(name);
         task.setSprint(sprint);
-        task.setStatus(Task.TaskStatus.PLANED);
-        task.setRequiredPosition(Employee.EmployeePosition.JUNIOR);
+        task.setStatus(Task.Status.PLANED);
+        task.setRequiredPosition(Employee.Position.JUNIOR);
         task.setExecutionTime(23);
         task.setEstimateTime(23);
         return task;
@@ -139,11 +137,11 @@ public class TestData {
         databaseConnector.getTaskDao().create(task2);
 
         Employee confirmationEmployee = getEmployee("confirmationEmployee");
-        TaskConfirmation taskConfirmation = getTaskConfirmation(confirmationEmployee, task1);
+        TaskConfirmation taskConfirmation = getTaskConfirmation();
 
         RelationUtils.addTaskConfirmation(confirmationEmployee, taskConfirmation);
         databaseConnector.getEmployeeDao().create(confirmationEmployee);
-        databaseConnector.getTaskConfirmationDao().create(taskConfirmation);
+        databaseConnector.getTaskDao().addEmployee(task1.getId(), confirmationEmployee);
 
         return new EmployeeTestData(task1, task2, confirmationEmployee, taskConfirmation);
     }

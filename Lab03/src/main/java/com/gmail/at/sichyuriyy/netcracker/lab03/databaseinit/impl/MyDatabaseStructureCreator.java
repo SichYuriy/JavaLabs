@@ -24,7 +24,6 @@ public class MyDatabaseStructureCreator implements StructureCreator {
     private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
     private static final String USER_TABLE_NAME = "User";
 
-    private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
     private static final String USER_ROLE_TABLE_NAME = "user_role";
     private static final String TASK_DEPENDENCY_TABLE_NAME = "task_dependency";
 
@@ -54,11 +53,6 @@ public class MyDatabaseStructureCreator implements StructureCreator {
         add(new Pair<>("plannedStartDate", DataType.DATE));
         add(new Pair<>("plannedEndDate", DataType.DATE));
         add(new Pair<>("managerId", DataType.LONG));
-    }};
-
-    private List<Pair<String, DataType>> taskEmployeeProperties = new ArrayList<Pair<String, DataType>>() {{
-        add(new Pair<>("taskId", DataType.LONG));
-        add(new Pair<>("employeeId", DataType.LONG));
     }};
 
     private List<Pair<String, DataType>> roleProperties = new ArrayList<Pair<String, DataType>>() {{
@@ -120,7 +114,6 @@ public class MyDatabaseStructureCreator implements StructureCreator {
         database.createTable(USER_ROLE_TABLE_NAME, userRoleProperties);
         database.createTable(SPRINT_TABLE_NAME, sprintProperties);
         database.createTable(TASK_TABLE_NAME, taskProperties);
-        database.createTable(TASK_EMPLOYEE_TABLE_NAME, taskEmployeeProperties);
         database.createTable(TASK_DEPENDENCY_TABLE_NAME, taskDependencyProperties);
         database.createTable(TASK_CONFIRMATION_TABLE_NAME, taskConfirmationProperties);
         database.createTable(TIME_REQUEST_TABLE_NAME, timeRequestProperties);

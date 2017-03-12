@@ -17,7 +17,7 @@ public class ProjectManagerMapper implements RecordMapper<ProjectManager> {
         manager.setPassword(record.getString("User.password"));
         manager.setLogin(record.getString("User.login"));
 
-        manager.setPosition(Employee.EmployeePosition
+        manager.setPosition(Employee.Position
                 .valueOf(record.getString("Employee.position")));
         return manager;
     }

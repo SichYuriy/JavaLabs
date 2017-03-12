@@ -5,53 +5,23 @@ package com.gmail.at.sichyuriyy.netcracker.lab03.entity;
  */
 public class TaskConfirmation {
 
-    public enum ConfirmationStatus {
+    public enum Status {
         CONFIRMED, UNCONFIRMED
     }
 
-    private Long id;
-    private Employee employee;
-    private Task task;
-    private ConfirmationStatus status;
+    private Status status;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
-    public ConfirmationStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(ConfirmationStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
     @Override
     public String toString() {
         return "TaskConfirmation{" +
-                "id=" + id +
-                ", employee=" + employee +
-                ", task=" + task +
                 ", status=" + status +
                 '}';
     }

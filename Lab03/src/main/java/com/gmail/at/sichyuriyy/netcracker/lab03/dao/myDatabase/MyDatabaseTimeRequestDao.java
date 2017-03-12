@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class MyDatabaseTimeRequestDao implements TimeRequestDao {
 
     private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
-    private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
+    private static final String TASK_CONFIRMATION_TABLE_NAME = "TaskConfirmation";
     private static final String SPRINT_TABLE_NAME = "Sprint";
     private static final String PROJECT_TABLE_NAME = "Project";
     private static final String TASK_TABLE_NAME = "Task";
@@ -114,7 +114,7 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
 
     @Override
     public List<TimeRequest> findByEmployeeId(Long id) {
-        List<Record> taskIdRecords = database.selectFrom(TASK_EMPLOYEE_TABLE_NAME,
+        List<Record> taskIdRecords = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME,
                 "employeeId", id);
         return taskIdRecords.stream()
                 .map(taskIdRecord -> taskIdRecord.getLong("taskId"))

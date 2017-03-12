@@ -1,5 +1,6 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
+import com.gmail.at.sichyuriyy.netcracker.lab03.FakeData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.RelationUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
@@ -10,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -91,7 +93,7 @@ public abstract class EmployeeDaoTest {
         employee.setPassword("updatedPassword");
         employee.setFirstName("updatedFirstName");
         employee.setLastName("updatedLastName");
-        employee.setPosition(Employee.EmployeePosition.MIDDLE);
+        employee.setPosition(Employee.Position.MIDDLE);
         employeeDao.update(employee);
 
         Employee dbEmployee = employeeDao.findById(employee.getId());
@@ -99,25 +101,16 @@ public abstract class EmployeeDaoTest {
     }
 
     @Test
-    public void findByTaskConfirmationId() {
-        TestData.EmployeeTestData testData = TestData.getEmployeeTestData(databaseConnector);
-
-        Employee expected = testData.confirmationEmployee;
-        Employee dbEmployee = employeeDao.findByTaskConfirmationId(testData.taskConfirmation.getId());
-
-        assertWeakEquals(expected, dbEmployee);
-    }
-
-    @Test
     public void findByTaskId() {
-        TestData.EmployeeTestData testData = TestData.getEmployeeTestData(databaseConnector);
-
         Employee employee1 = TestData.getEmployee("employee1");
         Employee employee2 = TestData.getEmployee("employee2");
         Employee employee3 = TestData.getEmployee("employee3");
 
-        Task task1 = testData.task1;
-        Task task2 = testData.task2;
+        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
+        Task task2 = TestData.getTask("task2", FakeData.getSprint(1L));
+
+        databaseConnector.getTaskDao().create(task1);
+        databaseConnector.getTaskDao().create(task2);
 
         employeeDao.create(employee1);
         employeeDao.create(employee2);
@@ -129,6 +122,9 @@ public abstract class EmployeeDaoTest {
 
         RelationUtils.addTaskEmployeeRelation(task1, employee1, employee2);
         RelationUtils.addTaskEmployeeRelation(task2, employee3);
+
+        employee1.setTaskConfirmations(Collections.singletonList(TestData.getTaskConfirmation()));
+        employee2.setTaskConfirmations(Collections.singletonList(TestData.getTaskConfirmation()));
 
         List<Employee> expected = new ArrayList<>();
         expected.add(employee1);
@@ -143,7 +139,21 @@ public abstract class EmployeeDaoTest {
         ));
     }
 
+    @Test
+    public void confirmTask() {
+        Task task = TestData.getTask(FakeData.getSprint(1L));
+        Employee employee = TestData.getEmployee();
 
+        databaseConnector.getTaskDao().create(task);
+        databaseConnector.getEmployeeDao().create(employee);
+        databaseConnector.getTaskDao().addEmployee(task.getId(), employee);
+        databaseConnector.getEmployeeDao().confirmTask(employee.getId(), task);
+
+        TaskConfirmation taskConfirmation = databaseConnector.getTaskConfirmationDao().findByTaskIdAndEmployeeId(task.getId(), employee.getId());
+
+        assertEquals(TaskConfirmation.Status.CONFIRMED, taskConfirmation.getStatus());
+
+    }
 
     private void assertWeakEquals(Employee expected, Employee actual) {
         assertEquals(expected.getId(), actual.getId());
@@ -156,7 +166,7 @@ public abstract class EmployeeDaoTest {
         assertTrue(TestUtils.equalContentCollections(
                 expected.getTaskConfirmations(),
                 actual.getTaskConfirmations(),
-                (c1, c2) -> c1.getId().equals(c2.getId())
+                (c1, c2) -> c1.getStatus().equals(c2.getStatus())
         ));
         assertTrue(TestUtils.equalContentCollections(
                 expected.getTasks(),
@@ -176,7 +186,7 @@ public abstract class EmployeeDaoTest {
                 && TestUtils.equalContentCollections(
                         expected.getTaskConfirmations(),
                         actual.getTaskConfirmations(),
-                        (c1, c2) -> c1.getId().equals(c2.getId()))
+                        (c1, c2) -> c1.getStatus().equals(c2.getStatus()))
                 && TestUtils.equalContentCollections(
                         expected.getTasks(),
                         actual.getTasks(),

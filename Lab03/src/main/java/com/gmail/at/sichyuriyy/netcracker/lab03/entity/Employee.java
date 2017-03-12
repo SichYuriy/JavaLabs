@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
  */
 public class Employee extends User {
 
-    public enum EmployeePosition {
+    public enum Position {
         JUNIOR, MIDDLE, SENIOR
     }
 
     private List<Task> tasks;
-    private EmployeePosition position;
+    private Position position;
     private List<TaskConfirmation> taskConfirmations;
 
     public List<Task> getTasks() {
@@ -24,11 +24,11 @@ public class Employee extends User {
         this.tasks = tasks;
     }
 
-    public EmployeePosition getPosition() {
+    public Position getPosition() {
         return position;
     }
 
-    public void setPosition(EmployeePosition position) {
+    public void setPosition(Position position) {
         this.position = position;
     }
 
@@ -46,7 +46,6 @@ public class Employee extends User {
                 "Employee{" +
                 "tasks=" + tasks +
                 ", position=" + position +
-                ", taskConfirmations=" + ((taskConfirmations!= null) ? taskConfirmations.stream().map(TaskConfirmation::getId).collect(Collectors.toList()) : null) +
                 '}';
     }
 }

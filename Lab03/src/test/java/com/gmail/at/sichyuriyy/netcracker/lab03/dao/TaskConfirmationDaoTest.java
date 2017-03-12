@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -42,74 +43,31 @@ public abstract class TaskConfirmationDaoTest {
     public void create() {
         Task task = TestData.getTask(FakeData.getSprint(1L));
         Employee employee = TestData.getEmployee();
-        TaskConfirmation taskConfirmation = TestData.getTaskConfirmation(employee, task);
+        TaskConfirmation taskConfirmation = TestData.getTaskConfirmation();
 
         databaseConnector.getTaskDao().create(task);
         databaseConnector.getEmployeeDao().create(employee);
-        taskConfirmationDao.create(taskConfirmation);
 
-        TaskConfirmation dbTaskConfirmation = taskConfirmationDao.findById(taskConfirmation.getId());
+        databaseConnector.getTaskDao().addEmployee(task.getId(), employee);
+
+        TaskConfirmation dbTaskConfirmation = taskConfirmationDao.findByTaskIdAndEmployeeId(
+                task.getId(),
+                employee.getId()
+        );
 
         assertWeakEquals(taskConfirmation, dbTaskConfirmation);
     }
 
     @Test
     public void delete() {
-        TaskConfirmation taskConfirmation = TestData.getTaskConfirmation(
-                FakeData.getEmployee(1L),
-                FakeData.getTask(1L)
-        );
-        taskConfirmationDao.create(taskConfirmation);
-        assertNotNull(taskConfirmationDao.findById(taskConfirmation.getId()));
-
-        taskConfirmationDao.delete(taskConfirmation.getId());
-        assertNull(taskConfirmationDao.findById(taskConfirmation.getId()));
-    }
-
-    @Test
-    public void findAll() {
-        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
-        Task task2 = TestData.getTask("task2", FakeData.getSprint(2L));
-        Employee employee1 = TestData.getEmployee("emp1");
-        Employee employee2 = TestData.getEmployee("emp2");
-
-        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation(employee1, task1);
-        TaskConfirmation taskConfirmation2 = TestData.getTaskConfirmation(employee2, task2);
-
-        databaseConnector.getTaskDao().create(task1);
-        databaseConnector.getTaskDao().create(task2);
-        databaseConnector.getEmployeeDao().create(employee1);
-        databaseConnector.getEmployeeDao().create(employee2);
-        taskConfirmationDao.create(taskConfirmation1);
-        taskConfirmationDao.create(taskConfirmation2);
-
-        List<TaskConfirmation> expected = new ArrayList<>();
-        expected.add(taskConfirmation1);
-        expected.add(taskConfirmation2);
-
-        List<TaskConfirmation> actual = taskConfirmationDao.findAll();
-
-        assertTrue(TestUtils.equalContentCollections(
-                expected,
-                actual,
-                this::weakEquals
-        ));
-    }
-
-    @Test
-    public void update() {
         Task task = TestData.getTask(FakeData.getSprint(1L));
         Employee employee = TestData.getEmployee();
-        TaskConfirmation taskConfirmation = TestData.getTaskConfirmation(employee, task);
-
         databaseConnector.getTaskDao().create(task);
         databaseConnector.getEmployeeDao().create(employee);
-        taskConfirmationDao.create(taskConfirmation);
-        taskConfirmation.setStatus(TaskConfirmation.ConfirmationStatus.CONFIRMED);
-        taskConfirmationDao.update(taskConfirmation);
-        TaskConfirmation dbTaskConfirmation = taskConfirmationDao.findById(taskConfirmation.getId());
+        databaseConnector.getTaskDao().addEmployee(task.getId(), employee);
 
-        assertWeakEquals(taskConfirmation, dbTaskConfirmation);
+        databaseConnector.getTaskDao().deleteEmployee(task.getId(), employee);
+        assertNull(taskConfirmationDao.findByTaskIdAndEmployeeId(task.getId(), employee.getId()));
     }
 
     @Test
@@ -119,17 +77,15 @@ public abstract class TaskConfirmationDaoTest {
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
 
-        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation(employee1, task1);
-        TaskConfirmation taskConfirmation2 = TestData.getTaskConfirmation(employee2, task1);
-        TaskConfirmation taskConfirmation3 = TestData.getTaskConfirmation(employee1, task2);
+        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation();
+        TaskConfirmation taskConfirmation2 = TestData.getTaskConfirmation();
 
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
         databaseConnector.getEmployeeDao().create(employee1);
         databaseConnector.getEmployeeDao().create(employee2);
-        taskConfirmationDao.create(taskConfirmation1);
-        taskConfirmationDao.create(taskConfirmation2);
-        taskConfirmationDao.create(taskConfirmation3);
+        databaseConnector.getTaskDao().addEmployees(task1.getId(), Arrays.asList(employee1, employee2));
+        databaseConnector.getTaskDao().addEmployee(task2.getId(), employee1);
 
         List<TaskConfirmation> expected = new ArrayList<>();
         expected.add(taskConfirmation1);
@@ -151,17 +107,15 @@ public abstract class TaskConfirmationDaoTest {
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
 
-        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation(employee1, task1);
-        TaskConfirmation taskConfirmation2 = TestData.getTaskConfirmation(employee1, task2);
-        TaskConfirmation taskConfirmation3 = TestData.getTaskConfirmation(employee2, task1);
+        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation();
+        TaskConfirmation taskConfirmation2 = TestData.getTaskConfirmation();
 
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
         databaseConnector.getEmployeeDao().create(employee1);
         databaseConnector.getEmployeeDao().create(employee2);
-        taskConfirmationDao.create(taskConfirmation1);
-        taskConfirmationDao.create(taskConfirmation2);
-        taskConfirmationDao.create(taskConfirmation3);
+        databaseConnector.getTaskDao().addEmployees(task1.getId(), Arrays.asList(employee1, employee2));
+        databaseConnector.getTaskDao().addEmployee(task2.getId(), employee1);
 
         List<TaskConfirmation> expected = new ArrayList<>();
         expected.add(taskConfirmation1);
@@ -183,17 +137,14 @@ public abstract class TaskConfirmationDaoTest {
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
 
-        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation(employee1, task1);
-        TaskConfirmation taskConfirmation2 = TestData.getTaskConfirmation(employee1, task2);
-        TaskConfirmation taskConfirmation3 = TestData.getTaskConfirmation(employee2, task1);
+        TaskConfirmation taskConfirmation1 = TestData.getTaskConfirmation();
 
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
         databaseConnector.getEmployeeDao().create(employee1);
         databaseConnector.getEmployeeDao().create(employee2);
-        taskConfirmationDao.create(taskConfirmation1);
-        taskConfirmationDao.create(taskConfirmation2);
-        taskConfirmationDao.create(taskConfirmation3);
+        databaseConnector.getTaskDao().addEmployees(task1.getId(), Arrays.asList(employee1, employee2));
+        databaseConnector.getTaskDao().addEmployee(task2.getId(), employee1);
 
         TaskConfirmation actual = taskConfirmationDao.findByTaskIdAndEmployeeId(
                 task1.getId(), employee1.getId()
@@ -203,17 +154,11 @@ public abstract class TaskConfirmationDaoTest {
     }
 
     private void assertWeakEquals(TaskConfirmation expected, TaskConfirmation actual) {
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getEmployee().getId(), actual.getEmployee().getId());
         assertEquals(expected.getStatus(), actual.getStatus());
-        assertEquals(expected.getTask().getId(), actual.getTask().getId());
     }
 
     private boolean weakEquals(TaskConfirmation expected, TaskConfirmation actual) {
-        return expected.getId().equals(actual.getId())
-                && expected.getStatus().equals(actual.getStatus())
-                && expected.getEmployee().getId().equals(actual.getEmployee().getId())
-                && expected.getTask().getId().equals(actual.getTask().getId());
+        return expected.getStatus().equals(actual.getStatus());
     }
 
 }

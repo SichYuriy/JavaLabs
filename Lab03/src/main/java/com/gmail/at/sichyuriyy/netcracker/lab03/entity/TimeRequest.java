@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class TimeRequest {
 
-    public enum Status implements Serializable {
+    public enum Status {
         ACCEPTED, DENIED, PENDING
     }
 

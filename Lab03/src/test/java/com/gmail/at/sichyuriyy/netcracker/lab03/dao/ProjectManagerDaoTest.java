@@ -90,7 +90,7 @@ public abstract class ProjectManagerDaoTest {
         projectManager.setPassword("updatedPassword");
         projectManager.setFirstName("updatedFirstName");
         projectManager.setLastName("updatedLastName");
-        projectManager.setPosition(Employee.EmployeePosition.MIDDLE);
+        projectManager.setPosition(Employee.Position.MIDDLE);
         projectManagerDao.update(projectManager);
 
         ProjectManager dbProjectManager = projectManagerDao.findById(projectManager.getId());
@@ -145,7 +145,7 @@ public abstract class ProjectManagerDaoTest {
         assertTrue(TestUtils.equalContentCollections(
                 expected.getTaskConfirmations(),
                 actual.getTaskConfirmations(),
-                (c1, c2) -> c1.getId().equals(c2.getId())
+                (c1, c2) -> c1.getStatus().equals(c2.getStatus())
         ));
         assertTrue(TestUtils.equalContentCollections(
                 expected.getTasks(),
@@ -170,7 +170,7 @@ public abstract class ProjectManagerDaoTest {
                 && TestUtils.equalContentCollections(
                         expected.getTaskConfirmations(),
                         actual.getTaskConfirmations(),
-                        (c1, c2) -> c1.getId().equals(c2.getId()))
+                        (c1, c2) -> c1.getStatus().equals(c2.getStatus()))
                 && TestUtils.equalContentCollections(
                         expected.getTasks(),
                         actual.getTasks(),

@@ -209,7 +209,7 @@ public class JsonDatabase implements Database {
         try {
             Files.write(fileTable, Collections.singletonList(jsonRow), StandardOpenOption.APPEND);
         } catch (IOException e) {
-            throw new IllegalStateException("add new data to the file", e);
+            throw new IllegalStateException("can not add new data to the file", e);
         }
         return id;
     }

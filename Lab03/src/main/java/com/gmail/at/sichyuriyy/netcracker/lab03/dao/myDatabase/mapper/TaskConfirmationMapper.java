@@ -9,8 +9,7 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
 public class TaskConfirmationMapper implements RecordMapper<TaskConfirmation> {
     @Override
     public TaskConfirmation map(TaskConfirmation confirmation, Record record) {
-        confirmation.setId(record.getLong("id"));
-        confirmation.setStatus(TaskConfirmation.ConfirmationStatus.valueOf(record.getString("status")));
+        confirmation.setStatus(TaskConfirmation.Status.valueOf(record.getString("status")));
         return confirmation;
     }
 }

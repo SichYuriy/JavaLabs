@@ -62,7 +62,7 @@ public class TimeRequestProxy extends TimeRequest {
         if (taskId != null) {
             task = taskDao.findById(taskId);
         } else {
-            task = taskDao.findByTaskConfirmationId(getId());
+            task = taskDao.findByTimeRequestId(getId());
         }
         this.setTask(task);
     }

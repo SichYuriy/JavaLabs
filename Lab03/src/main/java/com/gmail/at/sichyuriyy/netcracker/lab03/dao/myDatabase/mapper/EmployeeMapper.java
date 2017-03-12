@@ -16,7 +16,7 @@ public class EmployeeMapper implements RecordMapper<Employee> {
         employee.setPassword(record.getString("User.password"));
         employee.setLogin(record.getString("User.login"));
 
-        employee.setPosition(Employee.EmployeePosition
+        employee.setPosition(Employee.Position
                 .valueOf(record.getString("Employee.position")));
         return employee;
     }

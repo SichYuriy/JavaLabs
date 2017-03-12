@@ -3,9 +3,12 @@ package com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.EmployeeMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TaskConfirmation;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.EmployeeProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
+import com.sun.org.apache.regexp.internal.RE;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -21,7 +24,6 @@ public class MyDatabaseEmployeeDao implements EmployeeDao {
     private static final String USER_TABLE_NAME = "User";
     private static final String EMPLOYEE_TABLE_NAME = "Employee";
     private static final String TASK_CONFIRMATION_TABLE_NAME = "TaskConfirmation";
-    private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
 
 
     private EmployeeMapper employeeMapper = new EmployeeMapper();
@@ -108,25 +110,29 @@ public class MyDatabaseEmployeeDao implements EmployeeDao {
     }
 
     @Override
-    public Employee findByTaskConfirmationId(Long id) {
-        Record confirmation = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME, id);
-        if (confirmation == null) {
-            return null;
-        }
-        Long employeeId = confirmation.getLong("employeeId");
-
-        return (employeeId != null) ? findById(employeeId) : null;
-    }
-
-    @Override
     public List<Employee> findByTaskId(Long id) {
-        List<Record> empIdRecords = database.selectFrom(TASK_EMPLOYEE_TABLE_NAME,
+        List<Record> empIdRecords = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME,
                 "taskId", id);
 
         return empIdRecords.stream()
                 .map((record) -> record.getLong("employeeId"))
                 .map(this::findById)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void confirmTask(Long employeeId, Task task) {
+        List<Pair<String, Object>> filters = new ArrayList<>();
+        filters.add(new Pair<>("employeeId", employeeId));
+        filters.add(new Pair<>("taskId", task.getId()));
+
+        List<Record> taskConfirmationRecord = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME, filters);
+        if (taskConfirmationRecord.isEmpty())
+            return;
+        Long taskConfirmationId = taskConfirmationRecord.get(0).getLong("id");
+        List<Pair<String, Object>> values = new ArrayList<>();
+        values.add(new Pair<>("status", TaskConfirmation.Status.CONFIRMED.toString()));
+        database.update(TASK_CONFIRMATION_TABLE_NAME, taskConfirmationId, values);
     }
 
     public Database getDatabase() {
@@ -170,14 +176,14 @@ public class MyDatabaseEmployeeDao implements EmployeeDao {
     }
 
     private Employee parseRecord(Record record) {
-        Employee employee = new EmployeeProxy(taskDao, timeRequestDao,
+        EmployeeProxy employee = new EmployeeProxy(taskDao, timeRequestDao,
                 taskConfirmationDao, userDao);
         employeeMapper.map(employee, record);
         setProxies(employee, record);
         return employee;
     }
 
-    private void setProxies(Employee employee, Record record) {
+    private void setProxies(EmployeeProxy employee, Record record) {
 
     }
 

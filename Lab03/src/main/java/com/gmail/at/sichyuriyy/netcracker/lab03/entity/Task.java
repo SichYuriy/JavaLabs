@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class Task {
 
-    public enum TaskStatus {
+    public enum Status {
         UNCONFIRMED, PLANED, WORKING, FINISHED
     }
 
@@ -19,8 +19,8 @@ public class Task {
     private Task parentTask;
     private List<Task> childTasks;
     private List<Task> dependencies;
-    private Employee.EmployeePosition requiredPosition;
-    private TaskStatus status;
+    private Employee.Position requiredPosition;
+    private Status status;
     private List<TaskConfirmation> taskConfirmations;
     private List<TimeRequest> timeRequests;
     private Sprint sprint;
@@ -89,19 +89,19 @@ public class Task {
         this.dependencies = dependencies;
     }
 
-    public Employee.EmployeePosition getRequiredPosition() {
+    public Employee.Position getRequiredPosition() {
         return requiredPosition;
     }
 
-    public void setRequiredPosition(Employee.EmployeePosition requiredPosition) {
+    public void setRequiredPosition(Employee.Position requiredPosition) {
         this.requiredPosition = requiredPosition;
     }
 
-    public TaskStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(TaskStatus status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

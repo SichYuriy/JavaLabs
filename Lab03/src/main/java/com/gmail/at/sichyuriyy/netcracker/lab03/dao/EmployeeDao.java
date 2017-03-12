@@ -1,6 +1,7 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public interface EmployeeDao extends AbstractDao<Long, Employee> {
 
-    Employee findByTaskConfirmationId(Long id);
     List<Employee> findByTaskId(Long id);
+    void confirmTask(Long employeeId, Task task);
 
 }

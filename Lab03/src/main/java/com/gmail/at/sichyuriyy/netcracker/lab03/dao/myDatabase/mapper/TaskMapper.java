@@ -14,8 +14,8 @@ public class TaskMapper implements RecordMapper<Task> {
         task.setEstimateTime(record.getInteger("estimateTime"));
         task.setExecutionTime(record.getInteger("executionTime"));
         task.setName(record.getString("name"));
-        task.setRequiredPosition(Employee.EmployeePosition.valueOf(record.getString("requiredPosition")));
-        task.setStatus(Task.TaskStatus.valueOf(record.getString("status")));
+        task.setRequiredPosition(Employee.Position.valueOf(record.getString("requiredPosition")));
+        task.setStatus(Task.Status.valueOf(record.getString("status")));
 
         return task;
     }

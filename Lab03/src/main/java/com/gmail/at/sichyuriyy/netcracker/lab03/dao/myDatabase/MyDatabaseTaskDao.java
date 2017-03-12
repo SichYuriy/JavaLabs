@@ -4,7 +4,7 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.mapper.TaskMapper;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TimeRequest;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TaskConfirmation;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.proxy.TaskProxy;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
@@ -22,7 +22,6 @@ public class MyDatabaseTaskDao implements TaskDao {
     private static final String TASK_TABLE_NAME = "Task";
     private static final String TIME_REQUEST_TABLE_NAME = "TimeRequest";
     private static final String TASK_CONFIRMATION_TABLE_NAME = "TaskConfirmation";
-    private static final String TASK_EMPLOYEE_TABLE_NAME = "task_employee";
     private static final String TASK_DEPENDENCY_TABLE_NAME = "task_dependency";
 
     private TaskMapper taskMapper = new TaskMapper();
@@ -78,7 +77,7 @@ public class MyDatabaseTaskDao implements TaskDao {
 
     @Override
     public List<Task> findByEmployeeId(Long id) {
-        List<Record> taskIdRecords = database.selectFrom(TASK_EMPLOYEE_TABLE_NAME,
+        List<Record> taskIdRecords = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME,
                 "employeeId", id);
         return taskIdRecords.stream()
                 .map((idRecord) -> idRecord.getLong("taskId"))
@@ -136,7 +135,8 @@ public class MyDatabaseTaskDao implements TaskDao {
         List<Pair<String, Object>> values = new ArrayList<>();
         values.add(new Pair<>("taskId", taskId));
         values.add(new Pair<>("employeeId", employee.getId()));
-        database.insertInto(TASK_EMPLOYEE_TABLE_NAME, values);
+        values.add(new Pair<>("status", TaskConfirmation.Status.UNCONFIRMED.toString()));
+        database.insertInto(TASK_CONFIRMATION_TABLE_NAME, values);
     }
 
     @Override
@@ -149,22 +149,13 @@ public class MyDatabaseTaskDao implements TaskDao {
         List<Pair<String, Object>> filters = new ArrayList<>();
         filters.add(new Pair<>("taskId", taskId));
         filters.add(new Pair<>("employeeId", employee.getId()));
-        database.deleteFrom(TASK_EMPLOYEE_TABLE_NAME, filters);
+        database.deleteFrom(TASK_CONFIRMATION_TABLE_NAME, filters);
     }
 
     @Override
     public void deleteAllEmployees(Long taskId) {
-        database.deleteFrom(TASK_EMPLOYEE_TABLE_NAME,
+        database.deleteFrom(TASK_CONFIRMATION_TABLE_NAME,
                 "taskId", taskId);
-    }
-
-    @Override
-    public Task findByTaskConfirmationId(Long id) {
-        Record confirmationRecord = database.selectFrom(TASK_CONFIRMATION_TABLE_NAME, id);
-        if (confirmationRecord == null) {
-            return null;
-        }
-        return findById(confirmationRecord.getLong("taskId"));
     }
 
     @Override

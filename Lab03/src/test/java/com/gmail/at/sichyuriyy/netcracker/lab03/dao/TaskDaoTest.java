@@ -6,7 +6,6 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.DatabaseConnector;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.*;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.collections.CollectionsDatabase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +91,7 @@ public abstract class TaskDaoTest {
         task.setName("updatedName");
         task.setEstimateTime(125);
         task.setExecutionTime(120);
-        task.setStatus(Task.TaskStatus.WORKING);
+        task.setStatus(Task.Status.WORKING);
         taskDao.update(task);
         Task dbTask = taskDao.findById(task.getId());
         assertWeekEquals(task, dbTask);
@@ -119,6 +118,9 @@ public abstract class TaskDaoTest {
 
         RelationUtils.addTaskEmployeeRelation(task1, employee1, employee2);
         RelationUtils.addTaskEmployeeRelation(task2, employee1);
+
+        task1.setTaskConfirmations(Arrays.asList(TestData.getTaskConfirmation(), TestData.getTaskConfirmation()));
+        task2.setTaskConfirmations(Collections.singletonList(TestData.getTaskConfirmation()));
 
         List<Task> expected = new ArrayList<>();
         Collections.addAll(expected, task1, task2);
@@ -256,6 +258,8 @@ public abstract class TaskDaoTest {
         Collections.addAll(employeeList, employee2, employee3);
         taskDao.updateEmployees(task.getId(), employeeList);
 
+        task.setTaskConfirmations(Arrays.asList(TestData.getTaskConfirmation(), TestData.getTaskConfirmation()));
+
         RelationUtils.addTaskEmployeeRelation(task, employee2, employee3);
         Task actual = taskDao.findById(task.getId());
         assertWeekEquals(task, actual);
@@ -275,23 +279,6 @@ public abstract class TaskDaoTest {
         taskDao.deleteEmployee(task.getId(), employee);
 
         Task actual = taskDao.findById(task.getId());
-        assertWeekEquals(task, actual);
-    }
-
-    @Test
-    public void findByTaskConfirmationId() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
-        Task task = TestData.getTask(sprint);
-        TaskConfirmation taskConfirmation = TestData.getTaskConfirmation(FakeData.getEmployee(1L), task);
-
-        databaseConnector.getSprintDao().create(sprint);
-        taskDao.create(task);
-        databaseConnector.getTaskConfirmationDao().create(taskConfirmation);
-
-        RelationUtils.addTaskConfirmations(task, taskConfirmation);
-
-        Task actual = taskDao.findByTaskConfirmationId(taskConfirmation.getId());
-
         assertWeekEquals(task, actual);
     }
 
@@ -379,7 +366,7 @@ public abstract class TaskDaoTest {
         assertTrue(TestUtils.equalContentCollections(
                 expected.getTaskConfirmations(),
                 actual.getTaskConfirmations(),
-                (c1, c2) -> c1.getId().equals(c2.getId())
+                (c1, c2) -> c1.getStatus().equals(c2.getStatus())
         ));
         assertTrue(TestUtils.equalContentCollections(
                 expected.getTimeRequests(),
@@ -414,7 +401,7 @@ public abstract class TaskDaoTest {
                 && TestUtils.equalContentCollections(
                         expected.getTaskConfirmations(),
                         actual.getTaskConfirmations(),
-                        (c1, c2) -> c1.getId().equals(c2.getId()))
+                        (c1, c2) -> c1.getStatus().equals(c2.getStatus()))
                 && TestUtils.equalContentCollections(
                         expected.getTimeRequests(),
                         actual.getTimeRequests(),

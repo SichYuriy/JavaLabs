@@ -36,8 +36,7 @@ public class JsonObjectParser implements JsonParser<Map<String, Object>> {
         dataTypeReadMap.put(DataType.DATE, reader -> {
             Long time = reader.nextLong();
             return new Date(time);
-        }
-        );
+        });
     }
 
     @Override

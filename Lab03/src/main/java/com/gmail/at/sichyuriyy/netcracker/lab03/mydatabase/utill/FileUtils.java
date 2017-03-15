@@ -35,5 +35,28 @@ public class FileUtils {
         });
     }
 
+    public static void deleteDirHard(Path root) throws IOException {
+        while (true) {
+            try {
+                deleteDirRecursively(root);
+                return;
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    public static void deleteFile(Path path) throws IOException {
+        while (true) {
+            try {
+                Files.delete(path);
+                return;
+            } catch (IOException e) {
+
+            }
+        }
+
+
+    }
+
 
 }

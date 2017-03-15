@@ -1,38 +1,30 @@
-package com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.xml;
+package com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.serialization;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.DataType;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Database;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.Record;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.RecordImpl;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.RequestValidator;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.xml.mapper.XmlMetadataMapper;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.xml.mapper.XmlObjectMapper;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.xml.parser.XmlMetadataParser;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.impl.xml.parser.XmlObjectParser;
 import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.utill.FileUtils;
 import javafx.util.Pair;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * Created by Yuriy on 05.03.2017.
+ * Created by Yuriy on 3/12/2017.
  */
-public class XmlDatabase implements Database {
+public class BinDatabase implements Database {
 
     private static final String DB_ROOT = "_dbRoot";
-    private static final String METADATA_FILE_NAME = "_metadata.xmldb";
+    private static final String METADATA_FILE_NAME = "_metadata.bindb";
     private static final String TABLES_DIRECTORY = "_tables";
-    private static final String SEQUENCE_FILE_NAME = "_sequence.xmldb";
+    private static final String SEQUENCE_FILE_NAME = "_sequence.bindb";
 
     private static final int tableFileCount = 5;
 
@@ -43,22 +35,19 @@ public class XmlDatabase implements Database {
     private boolean storageInitialized;
     private boolean rewriteOldData;
 
-    private XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-    private XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
-
     private Map<String, Map<String, DataType>> metadata;
 
     private RequestValidator requestValidator;
 
 
-    public XmlDatabase(String rootDirectoryPath, boolean rewriteOldData) {
+    public BinDatabase(String rootDirectoryPath, boolean rewriteOldData) {
         this.root = Paths.get(rootDirectoryPath, DB_ROOT);
         this.metadataFilePath = Paths.get(rootDirectoryPath, DB_ROOT, METADATA_FILE_NAME);
         this.tablesPath = Paths.get(rootDirectoryPath, DB_ROOT, TABLES_DIRECTORY);
         this.rewriteOldData = rewriteOldData;
     }
 
-    public XmlDatabase(String rootDirectoryPath) {
+    public BinDatabase(String rootDirectoryPath) {
         this(rootDirectoryPath, false);
     }
 
@@ -86,29 +75,33 @@ public class XmlDatabase implements Database {
             propertyMap.put(property.getKey(), property.getValue());
         }
         propertyMap.put("id", DataType.LONG);
-        String propertiesXml = XmlMetadataMapper.getMapper().toXml(xmlOutputFactory, new Pair<>(name, propertyMap));
-        try {
-            Files.write(metadataFilePath, Collections.singletonList(propertiesXml), StandardOpenOption.APPEND);
+        createTableFiles(name);
+        metadata.put(name, propertyMap);
+        try (ObjectOutputStream writer =
+                     new ObjectOutputStream(
+                             new BufferedOutputStream(
+                                     new FileOutputStream(metadataFilePath.toFile())))) {
+            for (String tableName : metadata.keySet()) {
+                writer.writeObject(new Pair<>(tableName, metadata.get(tableName)));
+            }
         } catch (IOException e) {
             throw new IllegalStateException("can not change metadata file", e);
         }
-        createTableFiles(name);
-        metadata.put(name, propertyMap);
+
     }
 
     @Override
     public void dropTable(String name) {
-        XmlMetadataMapper mapper = XmlMetadataMapper.getMapper();
         checkInitialization();
         checkTableName(name);
         metadata.remove(name);
-        List<String> metadataLines = new ArrayList<>();
-        for (String tableName: metadata.keySet()) {
-            metadataLines.add(mapper.toXml(xmlOutputFactory, new Pair<>(tableName, metadata.get(tableName))));
-        }
-
-        try {
-            Files.write(metadataFilePath, metadataLines);
+        try (ObjectOutputStream writer =
+                     new ObjectOutputStream(
+                             new BufferedOutputStream(
+                                     new FileOutputStream(metadataFilePath.toFile())))) {
+            for (String tableName : metadata.keySet()) {
+                writer.writeObject(new Pair<>(tableName, metadata.get(tableName)));
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Can not rewrite metadata", e);
         }
@@ -207,10 +200,16 @@ public class XmlDatabase implements Database {
         updateRow(insertRow, values);
         Long id = generateNextId(tableName);
         insertRow.put("id", id);
-        String xmlRow = XmlObjectMapper.getMapper(properties).toXml(xmlOutputFactory, insertRow);
         Path fileTable = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
-        try {
-            Files.write(fileTable, Collections.singletonList(xmlRow), StandardOpenOption.APPEND);
+        List<Map<String, Object>> objects = readAllObjectsFromFile(fileTable);
+        objects.add(insertRow);
+        try (ObjectOutputStream writer =
+                new ObjectOutputStream(
+                        new BufferedOutputStream(
+                                new FileOutputStream(fileTable.toFile())))) {
+            for (Map<String, Object> row: objects) {
+                writer.writeObject(row);
+            }
         } catch (IOException e) {
             throw new IllegalStateException("add new data to the file", e);
         }
@@ -235,11 +234,10 @@ public class XmlDatabase implements Database {
     public void deleteFrom(String tableName, Long id) {
         checkInitialization();
         checkTableName(tableName);
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
         Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                 "_temp_" + getTablePartName(tableName, id));
-        deleteContentFromDataFile(filePath, tempFilePath, parser,
+        deleteContentFromDataFile(filePath, tempFilePath,
                 map -> map.get("id").equals(id));
     }
 
@@ -249,12 +247,11 @@ public class XmlDatabase implements Database {
         checkTableName(tableName);
         requestValidator.validatePropertyType(filterName, filterValue,
                 metadata.get(tableName));
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                     "_temp_" + filePartName);
-            deleteContentFromDataFile(filePath, tempFilePath, parser,
+            deleteContentFromDataFile(filePath, tempFilePath,
                     map -> Objects.equals(map.get(filterName), filterValue));
         }
 
@@ -265,12 +262,11 @@ public class XmlDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.validatePropertiesType(filters, metadata.get(tableName));
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                     "_temp_" + filePartName);
-            deleteContentFromDataFile(filePath, tempFilePath, parser,
+            deleteContentFromDataFile(filePath, tempFilePath,
                     map -> {
                         for (Pair<String, Object> filterPair: filters) {
                             if (!Objects.equals(map.get(filterPair.getKey()), filterPair.getValue())) {
@@ -287,12 +283,11 @@ public class XmlDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.checkProperty(filterName, metadata.get(tableName));
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                     "_temp_" + filePartName);
-            deleteContentFromDataFile(filePath, tempFilePath, parser,
+            deleteContentFromDataFile(filePath, tempFilePath,
                     map -> filter.test(map.get(filterName)));
         }
     }
@@ -302,12 +297,11 @@ public class XmlDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.checkProperties(filterNames, metadata.get(tableName));
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                     "_temp_" + filePartName);
-            deleteContentFromDataFile(filePath, tempFilePath, parser, filter);
+            deleteContentFromDataFile(filePath, tempFilePath, filter);
         }
     }
 
@@ -316,12 +310,10 @@ public class XmlDatabase implements Database {
         checkInitialization();
         checkTableName(tableName);
         requestValidator.validateInsertUpdateRequest(values, metadata.get(tableName));
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
-        XmlObjectMapper mapper = XmlObjectMapper.getMapper(metadata.get(tableName));
         Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
         Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                 "_temp_" + getTablePartName(tableName, id));
-        updateContentOfDataFile(filePath, tempFilePath, parser, mapper,
+        updateContentOfDataFile(filePath, tempFilePath,
                 map -> map.get("id").equals(id),
                 values);
     }
@@ -332,13 +324,11 @@ public class XmlDatabase implements Database {
         requestValidator.validateInsertUpdateRequest(values, metadata.get(tableName));
         requestValidator.validatePropertyType(filterName, filterValue,
                 metadata.get(tableName));
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
-        XmlObjectMapper mapper = XmlObjectMapper.getMapper(metadata.get(tableName));
         for (String filePartName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, filePartName);
             Path tempFilePath = Paths.get(tablesPath.toString(), tableName,
                     "_temp_" + filePartName);
-            updateContentOfDataFile(filePath, tempFilePath, parser, mapper,
+            updateContentOfDataFile(filePath, tempFilePath,
                     map -> Objects.equals(map.get(filterName), filterValue),
                     values);
         }
@@ -356,33 +346,33 @@ public class XmlDatabase implements Database {
     }
 
     private void deleteContentFromDataFile(Path filePath, Path tempFilePath,
-                                           XmlObjectParser parser,
                                            Predicate<Map<String, Object>> filter) {
         try {
             Files.createFile(tempFilePath);
         } catch (IOException e) {
             throw new IllegalStateException("can not create temp data file", e);
         }
-        try (BufferedReader reader = Files.newBufferedReader(filePath);
-             BufferedWriter writer = Files.newBufferedWriter(tempFilePath)) {
-            String line = reader.readLine();
-            while (line != null) {
-                Map<String, Object> obj = parser.fromXml(xmlInputFactory, line);
+        try (ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath.toFile())));
+             ObjectOutputStream writer = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(tempFilePath.toFile())))) {
+            while (true) {
+                Object readObject = reader.readObject();
+                Map<String, Object> obj = (Map<String, Object>)readObject;
                 if (!filter.test(obj)) {
-                    writer.write(line);
-                    writer.newLine();
+                    writer.writeObject(obj);
                 }
-                line = reader.readLine();
             }
+        } catch (EOFException e) {
+            // end of file -> continue work
         } catch (IOException e) {
             throw new IllegalStateException("can not update data file", e);
-        } catch (XMLStreamException e) {
+        } catch (ClassNotFoundException e) {
             throw new IllegalStateException("data is corrupted", e);
         }
         try {
-            Files.delete(filePath);
+            FileUtils.deleteFile(filePath);
+//            Files.delete(filePath);
         } catch (IOException e) {
-            throw new IllegalStateException("can not delete old data file");
+            throw new IllegalStateException("can not delete old data file", e);
         }
         File tempFile = tempFilePath.toFile();
         if (!tempFile.renameTo(filePath.toFile())) {
@@ -392,8 +382,6 @@ public class XmlDatabase implements Database {
     }
 
     private void updateContentOfDataFile(Path filePath, Path tempFilePath,
-                                         XmlObjectParser parser,
-                                         XmlObjectMapper mapper,
                                          Predicate<Map<String, Object>> filter,
                                          List<Pair<String, Object>> values) {
         try {
@@ -401,31 +389,28 @@ public class XmlDatabase implements Database {
         } catch (IOException e) {
             throw new IllegalStateException("can not create temp data file", e);
         }
-        try (BufferedReader reader = Files.newBufferedReader(filePath);
-             BufferedWriter writer = Files.newBufferedWriter(tempFilePath)) {
-            String line = reader.readLine();
-            while (line != null) {
-                Map<String, Object> obj = parser.fromXml(xmlInputFactory, line);
+        try (ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath.toFile())));
+             ObjectOutputStream writer= new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(tempFilePath.toFile())))) {
+            while (true) {
+                Object readObject = reader.readObject();
+                Map<String, Object> obj = (Map<String, Object>)readObject;
                 if (filter.test(obj)) {
                     updateRow(obj, values);
-                    String newJson = mapper.toXml(xmlOutputFactory, obj);
-                    writer.write(newJson);
-                    writer.newLine();
-                } else {
-                    writer.write(line);
-                    writer.newLine();
                 }
-                line = reader.readLine();
+                writer.writeObject(obj);
+
             }
+        } catch (EOFException e) {
+            // end of file -> continueWork
         } catch (IOException e) {
             throw new IllegalStateException("can not update data file", e);
-        } catch (XMLStreamException e) {
+        } catch (ClassNotFoundException e) {
             throw new IllegalStateException("data is corrupted", e);
         }
         try {
-            Files.delete(filePath);
+            FileUtils.deleteFile(filePath);
         } catch (IOException e) {
-            throw new IllegalStateException("can not delete old data file");
+            throw new IllegalStateException("can not delete old data file", e);
         }
         File tempFile = tempFilePath.toFile();
         if (!tempFile.renameTo(filePath.toFile())) {
@@ -434,21 +419,17 @@ public class XmlDatabase implements Database {
     }
 
     private void readMetadata() {
-        List<String> tableJsonList;
-        try {
-            tableJsonList = Files.readAllLines(metadataFilePath);
-        } catch (IOException e) {
-            throw new IllegalStateException("can not read metadata file", e);
-        }
         metadata = new HashMap<>();
-        Pair<String, Map<String, DataType>> table;
-        for (String propertiesJson: tableJsonList) {
-            try {
-                table = XmlMetadataParser.getParser().fromXml(xmlInputFactory, propertiesJson);
-            } catch (XMLStreamException e) {
-                throw new IllegalStateException("Metadata is corrupted", e);
+        try (ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(metadataFilePath.toFile())))) {
+            while (true) {
+                Object readObject = reader.readObject();
+                Pair<String, Map<String, DataType>> table = (Pair<String, Map<String, DataType>>)readObject;
+                metadata.put(table.getKey(), table.getValue());
             }
-            metadata.put(table.getKey(), table.getValue());
+        } catch (EOFException e) {
+            // end of file -> continue work
+        } catch (IOException | ClassNotFoundException e) {
+            throw new IllegalStateException("can not read metadata", e);
         }
     }
 
@@ -466,7 +447,7 @@ public class XmlDatabase implements Database {
     private void cleanDatabase() {
         try {
             if (Files.exists(root)) {
-                FileUtils.deleteDirRecursively(root);
+                FileUtils.deleteDirHard(root);
             }
         } catch (IOException e) {
             throw new IllegalStateException(
@@ -509,60 +490,64 @@ public class XmlDatabase implements Database {
 
     private void deleteTableFiles(String tableName) {
         try {
-            FileUtils.deleteDirRecursively(Paths.get(tablesPath.toString(), tableName));
+            FileUtils.deleteDirHard(Paths.get(tablesPath.toString(), tableName));
         } catch (IOException e) {
-            throw new IllegalArgumentException("can not delete table files");
+            throw new IllegalArgumentException("can not delete table files", e);
         }
     }
 
     private List<String> getTablePartsNames(String tableName) {
         List<String> result = new ArrayList<>();
         for (int i = 0; i < tableFileCount; i++) {
-            result.add("_" + tableName + "_part_" + i + ".xmldb");
+            result.add("_" + tableName + "_part_" + i + ".bindb");
         }
         return result;
     }
 
     private String getTablePartName(String tableName, Long id) {
-        return "_" + tableName + "_part_" + (id % tableFileCount) + ".xmldb";
+        return "_" + tableName + "_part_" + (id % tableFileCount) + ".bindb";
     }
 
     private List<Map<String, Object>> readAllObjects(String tableName) {
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         List<Map<String, Object>> result = new ArrayList<>();
         for (String fileName: getTablePartsNames(tableName)) {
             Path filePath = Paths.get(tablesPath.toString(), tableName, fileName);
-            List<String> lines;
-            try {
-                lines = Files.readAllLines(filePath);
-            } catch (IOException e) {
-                throw new IllegalStateException("can not read data file", e);
-            }
-            for (String line: lines) {
-                try {
-                    result.add(parser.fromXml(xmlInputFactory, line));
-                } catch (XMLStreamException e) {
-                    throw new IllegalStateException("data file is corrupted", e);
-                }
-            }
+            result.addAll(readAllObjectsFromFile(filePath));
         }
         return result;
     }
 
+    private List<Map<String, Object>> readAllObjectsFromFile(Path filePath) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath.toFile())))) {
+            while (true) {
+                Object obj = reader.readObject();
+                result.add((Map<String, Object>) obj);
+            }
+        } catch (EOFException e) {
+            // end of file continue work
+        } catch (IOException | ClassNotFoundException e) {
+            throw new IllegalStateException("can not read data file", e);
+        }
+        return result;
+    }
+
+
     private Map<String, Object> readById(String tableName, Long id) {
-        XmlObjectParser parser = XmlObjectParser.getParser(metadata.get(tableName));
         Path filePath = Paths.get(tablesPath.toString(), tableName, getTablePartName(tableName, id));
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath.toFile()))) {
-            String line = reader.readLine();
-            while (line != null) {
-                Map<String, Object> obj = parser.fromXml(xmlInputFactory, line);
+        try (ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath.toFile())))) {
+            while (true) {
+                Object readObject = reader.readObject();
+                Map<String, Object> obj = (Map<String, Object>)readObject;
                 if (obj.get("id").equals(id)) {
                     return obj;
                 }
             }
+        } catch (EOFException e) {
+            // end of file continue work
         } catch (IOException e) {
             throw new IllegalStateException("can not read data file", e);
-        } catch (XMLStreamException e) {
+        } catch (ClassNotFoundException e) {
             throw new IllegalStateException("data is corrupted", e);
         }
         return null;
@@ -602,5 +587,4 @@ public class XmlDatabase implements Database {
             throw new IllegalStateException("can change sequence file");
         }
     }
-
 }

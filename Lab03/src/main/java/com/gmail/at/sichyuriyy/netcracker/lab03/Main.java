@@ -1,25 +1,13 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Role;
-import com.gmail.at.sichyuriyy.netcracker.lab03.mydatabase.DataType;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import javafx.beans.binding.IntegerExpression;
-import javafx.util.Pair;
-
-import javax.xml.stream.*;
-import java.beans.XMLEncoder;
+import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.math.BigInteger;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.sql.Date;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * Created by Yuriy on 25.01.2017.
@@ -27,35 +15,56 @@ import java.util.stream.Stream;
 
 public class Main {
 
+    public static void main(String[] args) {
+        try {
+            Files.createFile(Paths.get("testFile.bin"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        try (ObjectOutputStream writer = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("testFile.bin")))) {
+            writer.writeObject(new Integer(1));
+            writer.writeObject(new Integer(2));
+            writer.writeObject(new Integer(3));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-    public static void main(String[] args) throws IOException, XMLStreamException {
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-        XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
-        StringWriter out = new StringWriter();
-        XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(out);
+        try (ObjectInputStream reader = new ObjectInputStream(new BufferedInputStream(new FileInputStream("testFile.bin")))) {
+            while (true) {
+                System.out.println(reader.readObject());
+            }
+        } catch (EOFException e) {
 
-        XmlMapper mapper = new XmlMapper(xmlInputFactory);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
-        sw.writeStartElement("root");
-        sw.writeCharacters("123");
-        sw.writeEndElement();
-        sw.close();
-        System.out.println(out.toString());
+        try (ObjectOutputStream writer = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("testFile.bin")))) {
+            writer.writeObject(new Integer(1));
+            writer.writeObject(new Integer(2));
+            writer.writeObject(new Integer(3));
+            writer.writeObject(new Integer(4));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader("<root>123</root>"));
-        System.out.println(reader.getEventType());
-        reader.next();
-        String name = reader.getName().toString();
-        reader.next();
-        String value = reader.getText();
+        try {
+            Files.delete(Paths.get("testFile.bin"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        System.out.println(name + " " + value);
-
-
-
-        reader.close();
     }
 
 
 }
+

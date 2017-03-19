@@ -1,6 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.FakeData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.RelationUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
@@ -106,8 +105,16 @@ public abstract class EmployeeDaoTest {
         Employee employee2 = TestData.getEmployee("employee2");
         Employee employee3 = TestData.getEmployee("employee3");
 
-        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
-        Task task2 = TestData.getTask("task2", FakeData.getSprint(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
+        Sprint sprint = TestData.getSprint(project);
+
+        Task task1 = TestData.getTask("task1", sprint);
+        Task task2 = TestData.getTask("task2", sprint);
+
+        databaseConnector.getCustomerDao().create(customer);
+        databaseConnector.getProjectDao().create(project);
+        databaseConnector.getSprintDao().create(sprint);
 
         databaseConnector.getTaskDao().create(task1);
         databaseConnector.getTaskDao().create(task2);
@@ -141,8 +148,16 @@ public abstract class EmployeeDaoTest {
 
     @Test
     public void confirmTask() {
-        Task task = TestData.getTask(FakeData.getSprint(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
+        Sprint sprint = TestData.getSprint(project);
+
+        Task task = TestData.getTask(sprint);
         Employee employee = TestData.getEmployee();
+
+        databaseConnector.getCustomerDao().create(customer);
+        databaseConnector.getProjectDao().create(project);
+        databaseConnector.getSprintDao().create(sprint);
 
         databaseConnector.getTaskDao().create(task);
         databaseConnector.getEmployeeDao().create(employee);

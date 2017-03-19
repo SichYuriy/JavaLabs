@@ -1,12 +1,9 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.FakeData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.DatabaseConnector;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Employee;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
-import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TaskConfirmation;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +38,9 @@ public abstract class TaskConfirmationDaoTest {
 
     @Test
     public void create() {
-        Task task = TestData.getTask(FakeData.getSprint(1L));
+        Sprint sprint = createSprint("sprint1");
+
+        Task task = TestData.getTask(sprint);
         Employee employee = TestData.getEmployee();
         TaskConfirmation taskConfirmation = TestData.getTaskConfirmation();
 
@@ -60,7 +59,8 @@ public abstract class TaskConfirmationDaoTest {
 
     @Test
     public void delete() {
-        Task task = TestData.getTask(FakeData.getSprint(1L));
+        Sprint sprint = createSprint("sprint1");
+        Task task = TestData.getTask(sprint);
         Employee employee = TestData.getEmployee();
         databaseConnector.getTaskDao().create(task);
         databaseConnector.getEmployeeDao().create(employee);
@@ -72,8 +72,10 @@ public abstract class TaskConfirmationDaoTest {
 
     @Test
     public void findByTaskId() {
-        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
-        Task task2 = TestData.getTask("task2", FakeData.getSprint(2L));
+        Sprint sprint1 = createSprint("sprint1");
+        Sprint sprint2 = createSprint("sprint2");
+        Task task1 = TestData.getTask("task1", sprint1);
+        Task task2 = TestData.getTask("task2", sprint2);
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
 
@@ -102,8 +104,10 @@ public abstract class TaskConfirmationDaoTest {
 
     @Test
     public void findByEmployeeId() throws Exception {
-        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
-        Task task2 = TestData.getTask("task2", FakeData.getSprint(2L));
+        Sprint sprint1 = createSprint("sprint1");
+        Sprint sprint2 = createSprint("sprint2");
+        Task task1 = TestData.getTask("task1", sprint1);
+        Task task2 = TestData.getTask("task2", sprint2);
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
 
@@ -132,8 +136,10 @@ public abstract class TaskConfirmationDaoTest {
 
     @Test
     public void findByTaskIdAndEmployeeId() throws Exception {
-        Task task1 = TestData.getTask("task1", FakeData.getSprint(1L));
-        Task task2 = TestData.getTask("task2", FakeData.getSprint(2L));
+        Sprint sprint1 = createSprint("sprint1");
+        Sprint sprint2 = createSprint("sprint2");
+        Task task1 = TestData.getTask("task1", sprint1);
+        Task task2 = TestData.getTask("task2", sprint2);
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
 
@@ -159,6 +165,17 @@ public abstract class TaskConfirmationDaoTest {
 
     private boolean weakEquals(TaskConfirmation expected, TaskConfirmation actual) {
         return expected.getStatus().equals(actual.getStatus());
+    }
+
+    private Sprint createSprint(String name) {
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
+        Sprint sprint = TestData.getSprint(name, project);
+
+        databaseConnector.getCustomerDao().create(customer);
+        databaseConnector.getProjectDao().create(project);
+        databaseConnector.getSprintDao().create(sprint);
+        return sprint;
     }
 
 }

@@ -1,6 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.FakeData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.RelationUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
@@ -38,7 +37,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void create() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
         databaseConnector.getSprintDao().create(sprint);
         taskDao.create(task);
@@ -48,7 +48,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void delete() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
         databaseConnector.getSprintDao().create(sprint);
         taskDao.create(task);
@@ -59,8 +60,10 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findAll() {
-        Sprint sprint1 = TestData.getSprint(FakeData.getProject(1L));
-        Sprint sprint2 = TestData.getSprint(FakeData.getProject(2L));
+        Project project1 = createProject("project1");
+        Project project2 = createProject("project2");
+        Sprint sprint1 = TestData.getSprint(project1);
+        Sprint sprint2 = TestData.getSprint(project2);
         Task task1 = TestData.getTask(sprint1);
         Task task2 = TestData.getTask(sprint1);
         Task task3 = TestData.getTask(sprint2);
@@ -84,7 +87,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void update() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
         databaseConnector.getSprintDao().create(sprint);
         taskDao.create(task);
@@ -99,7 +103,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findByEmployeeId() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task1 = TestData.getTask("task1", sprint);
         Task task2 = TestData.getTask("task2", sprint);
         Employee employee1 = TestData.getEmployee("emp1");
@@ -136,8 +141,10 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findBySprintId() {
-        Sprint sprint1 = TestData.getSprint(FakeData.getProject(1L));
-        Sprint sprint2 = TestData.getSprint(FakeData.getProject(1L));
+        Project project1 = createProject("project1");
+        Project project2 = createProject("project2");
+        Sprint sprint1 = TestData.getSprint(project1);
+        Sprint sprint2 = TestData.getSprint(project2);
 
         Task task1 = TestData.getTask("task1", sprint1);
         Task task2 = TestData.getTask("task2", sprint1);
@@ -163,7 +170,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findChildTasksByParentTaskId() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task1 = TestData.getTask("task1", sprint);
         Task task2 = TestData.getTask("task2", sprint);
         Task task3 = TestData.getTask("task3", sprint);
@@ -192,7 +200,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findDependenciesByParentTaskId() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task1 = TestData.getTask("task1", sprint);
         Task task2 = TestData.getTask("task2", sprint);
         Task task3 = TestData.getTask("task3", sprint);
@@ -223,7 +232,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findByTimeRequestId() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
         TimeRequest timeRequest = TestData.getTimeRequest(task);
 
@@ -240,7 +250,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void updateEmployees() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
         Employee employee1 = TestData.getEmployee("emp1");
         Employee employee2 = TestData.getEmployee("emp2");
@@ -267,7 +278,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void deleteEmployee() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
         Employee employee = TestData.getEmployee();
 
@@ -284,7 +296,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void findByChildTaskId() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task parent = TestData.getTask("parent", sprint);
         Task child = TestData.getTask("child", sprint);
         child.setParentTask(parent);
@@ -301,7 +314,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void updateDependencies() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task1 = TestData.getTask("task1", sprint);
         Task task2 = TestData.getTask("task2", sprint);
         Task task3 = TestData.getTask("task3", sprint);
@@ -325,7 +339,8 @@ public abstract class TaskDaoTest {
 
     @Test
     public void deleteDependency() {
-        Sprint sprint = TestData.getSprint(FakeData.getProject(1L));
+        Project project = createProject("project1");
+        Sprint sprint = TestData.getSprint(project);
         Task task1 = TestData.getTask("task1", sprint);
         Task task2 = TestData.getTask("task2", sprint);
 
@@ -411,5 +426,15 @@ public abstract class TaskDaoTest {
                         actual.getEmployees(),
                         (e1, e2) -> e1.getId().equals(e2.getId()));
     }
+    
+    private Project createProject(String name) {
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(name, customer, null);
+        
+        databaseConnector.getCustomerDao().create(customer);
+        databaseConnector.getProjectDao().create(project);
+        return project;
+    }
+    
 
 }

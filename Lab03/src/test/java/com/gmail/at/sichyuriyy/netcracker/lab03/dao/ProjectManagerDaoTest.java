@@ -1,6 +1,5 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.FakeData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.RelationUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
@@ -115,12 +114,14 @@ public abstract class ProjectManagerDaoTest {
 
     @Test
     public void findByTimeRequestId() {
+        Customer customer = TestData.getCustomer();
         ProjectManager projectManager = TestData.getProjectManager();
-        Project project = TestData.getProject(FakeData.getCustomer(1L), projectManager);
+        Project project = TestData.getProject(customer, projectManager);
         Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
 
         TimeRequest timeRequest = TestData.getTimeRequest(task);
+        databaseConnector.getCustomerDao().create(customer);
         projectManagerDao.create(projectManager);
         databaseConnector.getProjectDao().create(project);
         databaseConnector.getSprintDao().create(sprint);

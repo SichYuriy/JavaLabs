@@ -1,10 +1,10 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.dao;
 
-import com.gmail.at.sichyuriyy.netcracker.lab03.FakeData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.RelationUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestData;
 import com.gmail.at.sichyuriyy.netcracker.lab03.TestUtils;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.DatabaseConnector;
+import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Customer;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Project;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Sprint;
 import com.gmail.at.sichyuriyy.netcracker.lab03.entity.Task;
@@ -44,9 +44,11 @@ public abstract class SprintDaoTest {
 
     @Test
     public void create() {
-        Project project = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
         Sprint sprint = TestData.getSprint(project);
 
+        databaseConnector.getCustomerDao().create(customer);
         databaseConnector.getProjectDao().create(project);
         sprintDao.create(sprint);
 
@@ -57,9 +59,11 @@ public abstract class SprintDaoTest {
 
     @Test
     public void delete() {
-        Project project = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
         Sprint sprint = TestData.getSprint(project);
 
+        databaseConnector.getCustomerDao().create(customer);
         databaseConnector.getProjectDao().create(project);
         sprintDao.create(sprint);
         assertNotNull(sprintDao.findById(sprint.getId()));
@@ -70,12 +74,17 @@ public abstract class SprintDaoTest {
 
     @Test
     public void findAll() {
-        Project project1 = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
-        Project project2 = TestData.getProject(FakeData.getCustomer(2L), FakeData.getProjectManager(2L));
+        Customer customer1 = TestData.getCustomer("customer1");
+        Customer customer2 = TestData.getCustomer("customer2");
+        Project project1 = TestData.getProject(customer1, null);
+        Project project2 = TestData.getProject(customer2, null);
 
         Sprint sprint1 = TestData.getSprint(project1);
         Sprint sprint2 = TestData.getSprint(project1);
         Sprint sprint3 = TestData.getSprint(project2);
+
+        databaseConnector.getCustomerDao().create(customer1);
+        databaseConnector.getCustomerDao().create(customer2);
 
         databaseConnector.getProjectDao().create(project1);
         databaseConnector.getProjectDao().create(project2);
@@ -99,9 +108,11 @@ public abstract class SprintDaoTest {
 
     @Test
     public void update() {
-        Project project = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
         Sprint sprint = TestData.getSprint(project);
 
+        databaseConnector.getCustomerDao().create(customer);
         databaseConnector.getProjectDao().create(project);
         sprintDao.create(sprint);
 
@@ -120,12 +131,17 @@ public abstract class SprintDaoTest {
 
     @Test
     public void findByProjectId() {
-        Project project1 = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
-        Project project2 = TestData.getProject(FakeData.getCustomer(2L), FakeData.getProjectManager(2L));
+        Customer customer1 = TestData.getCustomer("customer1");
+        Customer customer2 = TestData.getCustomer("customer2");
+        Project project1 = TestData.getProject(customer1, null);
+        Project project2 = TestData.getProject(customer2, null);
 
         Sprint sprint1 = TestData.getSprint(project1);
         Sprint sprint2 = TestData.getSprint(project1);
         Sprint sprint3 = TestData.getSprint(project2);
+
+        databaseConnector.getCustomerDao().create(customer1);
+        databaseConnector.getCustomerDao().create(customer2);
 
         databaseConnector.getProjectDao().create(project1);
         databaseConnector.getProjectDao().create(project2);
@@ -148,10 +164,12 @@ public abstract class SprintDaoTest {
 
     @Test
     public void findByTaskId() {
-        Project project = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
         Sprint sprint = TestData.getSprint(project);
         Task task = TestData.getTask(sprint);
 
+        databaseConnector.getCustomerDao().create(customer);
         databaseConnector.getProjectDao().create(project);
         sprintDao.create(sprint);
         databaseConnector.getTaskDao().create(task);
@@ -165,10 +183,12 @@ public abstract class SprintDaoTest {
 
     @Test
     public void findByNextSprintId() {
-        Project project = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
         Sprint sprint1 = TestData.getSprint("sprint1", project);
         Sprint sprint2 = TestData.getSprint("sprint2", project);
 
+        databaseConnector.getCustomerDao().create(customer);
         databaseConnector.getProjectDao().create(project);
         sprintDao.create(sprint1);
         sprint2.setPreviousSprint(sprint1);
@@ -183,10 +203,11 @@ public abstract class SprintDaoTest {
 
     @Test
     public void findByPreviousSprintId() {
-        Project project = TestData.getProject(FakeData.getCustomer(1L), FakeData.getProjectManager(1L));
+        Customer customer = TestData.getCustomer();
+        Project project = TestData.getProject(customer, null);
         Sprint sprint1 = TestData.getSprint("sprint1", project);
         Sprint sprint2 = TestData.getSprint("sprint2", project);
-
+        databaseConnector.getCustomerDao().create(customer);
         databaseConnector.getProjectDao().create(project);
         sprintDao.create(sprint1);
         sprint2.setPreviousSprint(sprint1);

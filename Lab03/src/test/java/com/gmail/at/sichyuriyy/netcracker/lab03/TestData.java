@@ -128,46 +128,4 @@ public class TestData {
         return timeRequest;
     }
 
-    public static EmployeeTestData getEmployeeTestData(DatabaseConnector databaseConnector) {
-        Sprint fakeSprint = FakeData.getSprint(1L);
-        Task task1 = getTask(fakeSprint);
-        Task task2 = getTask(fakeSprint);
-
-        databaseConnector.getTaskDao().create(task1);
-        databaseConnector.getTaskDao().create(task2);
-
-        Employee confirmationEmployee = getEmployee("confirmationEmployee");
-        TaskConfirmation taskConfirmation = getTaskConfirmation();
-
-        RelationUtils.addTaskConfirmation(confirmationEmployee, taskConfirmation);
-        databaseConnector.getEmployeeDao().create(confirmationEmployee);
-        databaseConnector.getTaskDao().addEmployee(task1.getId(), confirmationEmployee);
-
-        return new EmployeeTestData(task1, task2, confirmationEmployee, taskConfirmation);
-    }
-
-    public static class EmployeeTestData {
-
-        public Task task1;
-        public Task task2;
-
-        public Employee confirmationEmployee;
-        public TaskConfirmation taskConfirmation;
-
-        public EmployeeTestData(Task task1, Task task2,
-                                Employee confirmationEmployee,
-                                TaskConfirmation taskConfirmation) {
-            this.task1 = task1;
-            this.task2 = task2;
-            this.confirmationEmployee = confirmationEmployee;
-            this.taskConfirmation = taskConfirmation;
-        }
-    }
-
-
-
-
-    
-    
-
 }

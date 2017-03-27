@@ -26,9 +26,6 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
     private static final String PROJECT_TABLE_NAME = "Project";
     private static final String TASK_TABLE_NAME = "Task";
 
-
-
-
     private TimeRequestMapper timeRequestMapper = new TimeRequestMapper();
 
     private Database database;
@@ -133,14 +130,13 @@ public class MyDatabaseTimeRequestDao implements TimeRequestDao {
     }
 
     private TimeRequest parseRecord(Record record) {
-        TimeRequestProxy proxy = new TimeRequestProxy(projectManagerDao, taskDao);
+        TimeRequestProxy proxy = new TimeRequestProxy(taskDao);
         timeRequestMapper.map(proxy, record);
         setProxies(proxy, record);
         return proxy;
     }
 
     private void setProxies(TimeRequestProxy proxy, Record record) {
-        proxy.setManagerId(record.getLong("projectManagerId"));
         proxy.setTaskId(record.getLong("taskId"));
     }
 

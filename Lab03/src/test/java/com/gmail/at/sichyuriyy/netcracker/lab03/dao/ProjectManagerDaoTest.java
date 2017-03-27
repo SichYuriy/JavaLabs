@@ -101,36 +101,13 @@ public abstract class ProjectManagerDaoTest {
         ProjectManager projectManager  = TestData.getProjectManager();
         Customer customer = TestData.getCustomer();
         projectManagerDao.create(projectManager);
-
+        databaseConnector.getCustomerDao().create(customer);
         Project project = TestData.getProject(customer, projectManager);
         databaseConnector.getProjectDao().create(project);
 
         RelationUtils.addManagedProject(projectManager, project);
 
         ProjectManager dbManager = projectManagerDao.findByProjectId(project.getId());
-
-        assertWeakEquals(projectManager, dbManager);
-    }
-
-    @Test
-    public void findByTimeRequestId() {
-        Customer customer = TestData.getCustomer();
-        ProjectManager projectManager = TestData.getProjectManager();
-        Project project = TestData.getProject(customer, projectManager);
-        Sprint sprint = TestData.getSprint(project);
-        Task task = TestData.getTask(sprint);
-
-        TimeRequest timeRequest = TestData.getTimeRequest(task);
-        databaseConnector.getCustomerDao().create(customer);
-        projectManagerDao.create(projectManager);
-        databaseConnector.getProjectDao().create(project);
-        databaseConnector.getSprintDao().create(sprint);
-        databaseConnector.getTaskDao().create(task);
-        databaseConnector.getTimeRequestDao().create(timeRequest);
-
-        RelationUtils.addManagedProject(projectManager, project);
-
-        ProjectManager dbManager = projectManagerDao.findByTimeRequestId(timeRequest.getId());
 
         assertWeakEquals(projectManager, dbManager);
     }

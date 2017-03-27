@@ -15,12 +15,17 @@ public class JdbcTemplate {
 
     private ConnectionManager connectionManager;
 
-
+    public JdbcTemplate(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
+    }
 
     public <T> T queryObject(String sql, EntityExtractor<T> producer, Object... params){
-        Object[] result = new Object[0];
+        Object[] result = new Object[1];
         query(sql, (rs) -> {
-            result[0] = producer.extract(rs).get(0);
+            List<T> resultList = producer.extract(rs);
+            if (!resultList.isEmpty()) {
+                result[0] = resultList.get(0);
+            }
         }, params);
         return (T) result[0];
     }
@@ -29,7 +34,7 @@ public class JdbcTemplate {
         Object[] result = new Object[1];
         query(sql, (rs) -> {
             result[0] = producer.extract(rs);
-        });
+        }, params);
         return (List<T>) result[0];
     }
 

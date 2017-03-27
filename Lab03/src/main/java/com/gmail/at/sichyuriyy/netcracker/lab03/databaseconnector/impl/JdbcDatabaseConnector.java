@@ -1,29 +1,25 @@
 package com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.impl;
 
 import com.gmail.at.sichyuriyy.netcracker.lab03.dao.*;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.*;
-import com.gmail.at.sichyuriyy.netcracker.lab03.dao.mydatabase.factory.MyDatabaseDaoFactory;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.jdbc.factory.JdbcDaoFactory;
+import com.gmail.at.sichyuriyy.netcracker.lab03.dao.jdbc.impl.*;
 import com.gmail.at.sichyuriyy.netcracker.lab03.databaseconnector.DatabaseConnector;
 
 /**
- * Created by Yuriy on 25.02.2017.
+ * Created by Yuriy on 3/20/2017.
  */
-public class CollectionsDatabaseConnector implements DatabaseConnector {
+public class JdbcDatabaseConnector implements DatabaseConnector {
+    private JdbcProjectDao projectDao;
+    private JdbcSprintDao sprintDao;
+    private JdbcTaskDao taskDao;
+    private JdbcTimeRequestDao timeRequestDao;
+    private JdbcUserDao userDao;
+    private JdbcCustomerDao customerDao;
+    private JdbcEmployeeDao employeeDao;
+    private JdbcProjectManagerDao projectManagerDao;
+    private JdbcTaskConfirmationDao taskConfirmationDao;
 
-    private MyDatabaseDaoFactory daoFactory;
-
-    private MyDatabaseProjectDao projectDao;
-    private MyDatabaseSprintDao sprintDao;
-    private MyDatabaseTaskDao taskDao;
-    private MyDatabaseTimeRequestDao timeRequestDao;
-    private MyDatabaseUserDao userDao;
-    private MyDatabaseCustomerDao customerDao;
-    private MyDatabaseEmployeeDao employeeDao;
-    private MyDatabaseProjectManagerDao projectManagerDao;
-    private MyDatabaseTaskConfirmationDao taskConfirmationDao;
-
-    public CollectionsDatabaseConnector(MyDatabaseDaoFactory daoFactory) {
-        this.daoFactory = daoFactory;
+    public JdbcDatabaseConnector(JdbcDaoFactory daoFactory) {
         createDao(daoFactory);
         initDaoDependencies();
     }
@@ -73,7 +69,7 @@ public class CollectionsDatabaseConnector implements DatabaseConnector {
         return projectManagerDao;
     }
 
-    private void createDao(MyDatabaseDaoFactory daoFactory) {
+    private void createDao(JdbcDaoFactory daoFactory) {
         customerDao = daoFactory.getCustomerDao();
         employeeDao = daoFactory.getEmployeeDao();
         projectDao = daoFactory.getProjectDao();
@@ -150,6 +146,4 @@ public class CollectionsDatabaseConnector implements DatabaseConnector {
         userDao.setEmployeeDao(employeeDao);
         userDao.setCustomerDao(customerDao);
     }
-
-
 }

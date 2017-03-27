@@ -62,7 +62,8 @@ public abstract class ProjectDaoTest {
         ProjectManager projectManager = TestData.getProjectManager();
 
         Project project = TestData.getProject(customer, projectManager);
-
+        databaseConnector.getCustomerDao().create(customer);
+        databaseConnector.getProjectManagerDao().create(projectManager);
         projectDao.create(project);
         assertNotNull(projectDao.findById(project.getId()));
 
@@ -111,10 +112,10 @@ public abstract class ProjectDaoTest {
         databaseConnector.getProjectManagerDao().create(projectManager);
         projectDao.create(project);
         project.setName("updatedName");
-        project.setStartDate(new Date(1));
-        project.setEndDate(new Date(101));
-        project.setPlannedStartDate(new Date(1));
-        project.setPlannedEndDate(new Date(101));
+        project.setStartDate(new Date(1, 0, 0));
+        project.setEndDate(new Date(1, 0, 0));
+        project.setPlannedStartDate(new Date(1, 0, 0));
+        project.setPlannedEndDate(new Date(1, 0, 0));
         projectDao.update(project);
 
         Project dbProject = projectDao.findById(project.getId());
@@ -180,26 +181,6 @@ public abstract class ProjectDaoTest {
                 actual,
                 this::weakEquals
         ));
-    }
-
-    @Test
-    public void findBySprintId() {
-        Customer customer = TestData.getCustomer();
-        ProjectManager projectManager = TestData.getProjectManager();
-
-        Project project = TestData.getProject(customer, projectManager);
-        Sprint sprint = TestData.getSprint(project);
-
-        databaseConnector.getCustomerDao().create(customer);
-        databaseConnector.getProjectManagerDao().create(projectManager);
-        projectDao.create(project);
-        databaseConnector.getSprintDao().create(sprint);
-
-        RelationUtils.addSprints(project, sprint);
-
-        Project dbProject = projectDao.findBySprintId(sprint.getId());
-
-        assertWeakEquals(project, dbProject);
     }
 
     @Test

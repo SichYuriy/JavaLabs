@@ -13,17 +13,13 @@ import com.gmail.at.sichyuriyy.netcracker.lab03.entity.TimeRequest;
  */
 public class TimeRequestProxy extends TimeRequest {
 
-    private ProjectManagerDao projectManagerDao;
     private TaskDao taskDao;
 
-    private boolean managerLoaded;
     private boolean taskLoaded;
 
-    private Long managerId;
     private Long taskId;
 
-    public TimeRequestProxy(ProjectManagerDao projectManagerDao, TaskDao taskDao) {
-        this.projectManagerDao = projectManagerDao;
+    public TimeRequestProxy(TaskDao taskDao) {
         this.taskDao = taskDao;
     }
 
@@ -39,14 +35,6 @@ public class TimeRequestProxy extends TimeRequest {
     public void setTask(Task task) {
         taskLoaded = true;
         super.setTask(task);
-    }
-
-    public Long getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(Long managerId) {
-        this.managerId = managerId;
     }
 
     public Long getTaskId() {

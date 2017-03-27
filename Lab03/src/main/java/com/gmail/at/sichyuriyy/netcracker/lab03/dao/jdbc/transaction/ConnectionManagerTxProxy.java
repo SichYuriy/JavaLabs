@@ -10,6 +10,8 @@ import java.sql.SQLException;
  */
 public class ConnectionManagerTxProxy extends ConnectionManager {
 
+    private static int conn_number=1;
+
     private ConnectionManager connectionManager;
 
     private final ThreadLocal<ConnectionTxProxy> connThreadLocal = new ThreadLocal<>();
@@ -36,6 +38,7 @@ public class ConnectionManagerTxProxy extends ConnectionManager {
         try {
             ConnectionTxProxy conn = connThreadLocal.get();
             conn.getConnection().close();
+            System.out.println("close connection # " + conn_number++);
         } finally {
             connThreadLocal.remove();
         }

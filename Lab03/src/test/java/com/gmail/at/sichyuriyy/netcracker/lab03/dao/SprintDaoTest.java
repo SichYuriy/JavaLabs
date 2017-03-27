@@ -118,10 +118,10 @@ public abstract class SprintDaoTest {
 
         sprint.setFinished(false);
         sprint.setName("updatedName");
-        sprint.setStartDate(new Date(10));
-        sprint.setEndDate(new Date(101));
-        sprint.setPlannedStartDate(new Date(10));
-        sprint.setPlannedEndDate(new Date(101));
+        sprint.setStartDate(new Date(1, 0, 0));
+        sprint.setEndDate(new Date(1, 1, 1));
+        sprint.setPlannedStartDate(new Date(1, 1, 2));
+        sprint.setPlannedEndDate(new Date(1, 2, 1));
         sprintDao.update(sprint);
 
         Sprint dbSprint = sprintDao.findById(sprint.getId());

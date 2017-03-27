@@ -11,6 +11,6 @@ public interface TaskConfirmationDao {
 
     List<TaskConfirmation> findByTaskId(Long id);
     List<TaskConfirmation> findByEmployeeId(Long id);
-    TaskConfirmation findByTaskIdAndEmployeeId(Long taskId, Long EmployeeId);
+    TaskConfirmation findByTaskIdAndEmployeeId(Long taskId, Long employeeId);
 
 }

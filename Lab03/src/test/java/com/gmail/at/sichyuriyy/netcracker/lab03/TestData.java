@@ -36,10 +36,10 @@ public class TestData {
         Project project = new Project();
         project.setCustomer(customer);
         project.setName(name);
-        project.setStartDate(new Date(0));
-        project.setEndDate(new Date(100));
-        project.setPlannedStartDate(new Date(0));
-        project.setPlannedEndDate(new Date(100));
+        project.setStartDate(new Date(1, 1, 1));
+        project.setEndDate(new Date(1, 1, 3));
+        project.setPlannedStartDate(new Date(1, 1, 2));
+        project.setPlannedEndDate(new Date(1, 1, 4));
         project.setProjectManager(projectManager);
 
         return project;
@@ -91,10 +91,10 @@ public class TestData {
         sprint.setFinished(false);
         sprint.setName(name);
         sprint.setProject(project);
-        sprint.setStartDate(new Date(0));
-        sprint.setEndDate(new Date(100));
-        sprint.setPlannedStartDate(new Date(0));
-        sprint.setPlannedEndDate(new Date(100));
+        sprint.setStartDate(new Date(1, 1, 1));
+        sprint.setEndDate(new Date(1, 1, 3));
+        sprint.setPlannedStartDate(new Date(1, 1, 2));
+        sprint.setPlannedEndDate(new Date(1, 1, 4));
         return sprint;
     }
 

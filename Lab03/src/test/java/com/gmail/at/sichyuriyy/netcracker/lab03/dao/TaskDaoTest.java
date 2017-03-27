@@ -101,43 +101,7 @@ public abstract class TaskDaoTest {
         assertWeekEquals(task, dbTask);
     }
 
-    @Test
-    public void findByEmployeeId() {
-        Project project = createProject("project1");
-        Sprint sprint = TestData.getSprint(project);
-        Task task1 = TestData.getTask("task1", sprint);
-        Task task2 = TestData.getTask("task2", sprint);
-        Employee employee1 = TestData.getEmployee("emp1");
-        Employee employee2 = TestData.getEmployee("emp2");
 
-        databaseConnector.getSprintDao().create(sprint);
-        databaseConnector.getTaskDao().create(task1);
-        databaseConnector.getTaskDao().create(task2);
-
-        databaseConnector.getEmployeeDao().create(employee1);
-        databaseConnector.getEmployeeDao().create(employee2);
-
-        taskDao.addEmployee(task1.getId(), employee1);
-        taskDao.addEmployee(task1.getId(), employee2);
-        taskDao.addEmployee(task2.getId(), employee1);
-
-        RelationUtils.addTaskEmployeeRelation(task1, employee1, employee2);
-        RelationUtils.addTaskEmployeeRelation(task2, employee1);
-
-        task1.setTaskConfirmations(Arrays.asList(TestData.getTaskConfirmation(), TestData.getTaskConfirmation()));
-        task2.setTaskConfirmations(Collections.singletonList(TestData.getTaskConfirmation()));
-
-        List<Task> expected = new ArrayList<>();
-        Collections.addAll(expected, task1, task2);
-
-        List<Task> actual = taskDao.findByEmployeeId(employee1.getId());
-
-        assertTrue(TestUtils.equalContentCollections(
-                expected,
-                actual,
-                this::weakEquals
-        ));
-    }
 
     @Test
     public void findBySprintId() {
@@ -231,52 +195,6 @@ public abstract class TaskDaoTest {
     }
 
     @Test
-    public void findByTimeRequestId() {
-        Project project = createProject("project1");
-        Sprint sprint = TestData.getSprint(project);
-        Task task = TestData.getTask(sprint);
-        TimeRequest timeRequest = TestData.getTimeRequest(task);
-
-        databaseConnector.getSprintDao().create(sprint);
-        taskDao.create(task);
-        databaseConnector.getTimeRequestDao().create(timeRequest);
-
-        RelationUtils.addTimeRequests(task, timeRequest);
-
-        Task actual = taskDao.findByTimeRequestId(timeRequest.getId());
-
-        assertWeekEquals(task, actual);
-    }
-
-    @Test
-    public void updateEmployees() {
-        Project project = createProject("project1");
-        Sprint sprint = TestData.getSprint(project);
-        Task task = TestData.getTask(sprint);
-        Employee employee1 = TestData.getEmployee("emp1");
-        Employee employee2 = TestData.getEmployee("emp2");
-        Employee employee3 = TestData.getEmployee("emp3");
-
-        databaseConnector.getSprintDao().create(sprint);
-        databaseConnector.getTaskDao().create(task);
-        databaseConnector.getEmployeeDao().create(employee1);
-        databaseConnector.getEmployeeDao().create(employee2);
-        databaseConnector.getEmployeeDao().create(employee3);
-
-        taskDao.addEmployee(task.getId(), employee1);
-
-        List<Employee> employeeList = new ArrayList<>();
-        Collections.addAll(employeeList, employee2, employee3);
-        taskDao.updateEmployees(task.getId(), employeeList);
-
-        task.setTaskConfirmations(Arrays.asList(TestData.getTaskConfirmation(), TestData.getTaskConfirmation()));
-
-        RelationUtils.addTaskEmployeeRelation(task, employee2, employee3);
-        Task actual = taskDao.findById(task.getId());
-        assertWeekEquals(task, actual);
-    }
-
-    @Test
     public void deleteEmployee() {
         Project project = createProject("project1");
         Sprint sprint = TestData.getSprint(project);
@@ -294,23 +212,7 @@ public abstract class TaskDaoTest {
         assertWeekEquals(task, actual);
     }
 
-    @Test
-    public void findByChildTaskId() {
-        Project project = createProject("project1");
-        Sprint sprint = TestData.getSprint(project);
-        Task parent = TestData.getTask("parent", sprint);
-        Task child = TestData.getTask("child", sprint);
-        child.setParentTask(parent);
-        databaseConnector.getSprintDao().create(sprint);
-        taskDao.create(parent);
-        taskDao.create(child);
 
-        RelationUtils.addChildTasksRelation(parent, child);
-
-        Task actual = taskDao.findByChildTaskId(child.getId());
-
-        assertWeekEquals(parent, actual);
-    }
 
     @Test
     public void updateDependencies() {
